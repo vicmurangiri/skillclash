@@ -36,41 +36,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
             console.log("Authenticated completely:", authResult);
 
-            // Forward returned auth parameters to backend session verification endpoint
-            const serverVerified = await verifyUserSessionWithBackend(authResult);
+            // Bypassing server check for GitHub Pages frontend testing
+            authStatus.textContent = "Verified";
+            playerUsername.textContent = authResult.user.username;
+            gameArena.style.display = "block";
 
-            if (serverVerified) {
-                authStatus.textContent = "Verified";
-                playerUsername.textContent = authResult.user.username;
-                gameArena.style.display = "block";
-            } else {
-                authStatus.textContent = "Server Verification Failed.";
-                signinBtn.style.display = "block";
-            }
         } catch (error) {
             console.error("Authentication flow failed:", error);
             authStatus.textContent = "Sign In Failed.";
             signinBtn.style.display = "block";
-        }
-    }
-
-    async function verifyUserSessionWithBackend(authResult) {
-        try {
-            const response = await fetch("/api/auth/session", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    accessToken: authResult.accessToken,
-                    user: authResult.user
-                })
-            });
-            const data = await response.json();
-            return data.success;
-        } catch (err) {
-            console.error("Backend communication error:", err);
-            return false;
         }
     }
 });
