@@ -4,24 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- Include the official Pi Network SDK -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d0e15;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #161925;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid #2a2e45;
+        }
+        h1 {
+            color: #00ffcc;
+            margin-bottom: 5px;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #23273a;
+            color: #00ffcc;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .welcome-msg {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        .instructions {
+            color: #8a92b2;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+        .node-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .node-card {
+            background: #202438;
+            border: 2px solid #2a2e45;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .node-card:hover {
+            border-color: #00ffcc;
+            transform: translateY(-3px);
+            background: #252b47;
+        }
+        .node-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .node-meta {
+            font-size: 0.8rem;
+            color: #00ffcc;
+        }
+        #signin-btn {
+            background: linear-gradient(135deg, #00ffcc, #00bfff);
+            color: #0d0e15;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,255,204,0.3);
+        }
+        #game-arena {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="app-container">
-        <header>
-            <h1>SkillClash AI</h1>
-            <div id="auth-status">Connecting to Pi Network...</div>
-            <button id="signin-btn" style="display: none;">Sign In with Pi</button>
-        </header>
 
-        <main id="game-arena" style="display: none;">
-            <div class="welcome-box">
-                <h2>Welcome, <span id="player-username">Player</span>!</h2>
-                <p>Select a node to begin tournament trivia.</p>
+    <div class="container">
+        <h1>SkillClash AI</h1>
+        <div id="auth-status" class="status-badge">Initializing SDK...</div>
+        
+        <button id="signin-btn" style="display: none;">Sign In with Pi</button>
+
+        <!-- Hidden until user is authenticated -->
+        <div id="game-arena">
+            <div class="welcome-msg">Welcome, <span id="player-username">Pioneer</span>!</div>
+            <div class="instructions">Select a node to begin tournament trivia.</div>
+            
+            <div class="node-grid">
+                <div class="node-card" onclick="alert('Entering Tech Trivia...')">
+                    <div class="node-title">🤖 AI & Tech</div>
+                    <div class="node-meta">Entry: 0.1 Pi</div>
+                </div>
+                <div class="node-card" onclick="alert('Entering Crypto Trivia...')">
+                    <div class="node-title">⚡ Web3 & Crypto</div>
+                    <div class="node-meta">Entry: 0.1 Pi</div>
+                </div>
+                <div class="node-card" onclick="alert('Entering Pop Culture Trivia...')">
+                    <div class="node-title">🎬 Pop Culture</div>
+                    <div class="node-meta">Entry: 0.05 Pi</div>
+                </div>
+                <div class="node-card" onclick="alert('Entering Speed Round Trivia...')">
+                    <div class="node-title">⏱️ Speed Round</div>
+                    <div class="node-meta">Entry: 0.2 Pi</div>
+                </div>
             </div>
-        </main>
+        </div>
     </div>
-    <script src="app.js"></script>
+
 </body>
 </html>
