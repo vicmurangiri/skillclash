@@ -2,178 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SkillClash AI - Pi Trivia Arena</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillClash AI</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
+    <div id="app-container">
+        <header>
+            <h1>SkillClash AI</h1>
+            <div id="auth-status">Connecting to Pi Network...</div>
+            <button id="signin-btn" style="display: none;">Sign In with Pi</button>
+        </header>
 
-    <!-- TOP APP BAR WITH LINKED BRANDING LOGO -->
-    <header class="app-bar">
-        <div class="app-logo-mark">
-            <div class="logo-icon-circle">
-                <i class="fa-solid fa-swords"></i>
+        <main id="game-arena" style="display: none;">
+            <div class="welcome-box">
+                <h2>Welcome, <span id="player-username">Player</span>!</h2>
+                <p>Select a node to begin tournament trivia.</p>
             </div>
-            <span class="logo-text">SkillClash<span class="logo-ai">AI</span></span>
-        </div>
-        <div class="balances">
-            <span class="balance-badge pi-bal"><i class="fa-solid fa-circle-p"></i> 14.50 Pi</span>
-            <span class="balance-badge xp-bal"><i class="fa-solid fa-star"></i> 1,250 XP</span>
-        </div>
-    </header>
-
-    <!-- STREAK RECOVERY NOTIFICATION BANNER -->
-    <div id="streak-warning-banner" class="streak-alert-banner">
-        <div class="banner-text">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span><strong>Streak At Risk!</strong> Complete a level or repair your streak before it resets!</span>
-        </div>
-        <button class="btn-banner-action" onclick="switchTab('vault')">Fix Now</button>
+        </main>
     </div>
-
-    <!-- MAIN CONTAINER (SCROLLABLE CONTENT) -->
-    <main class="content-container">
-
-        <!-- ================= TAB 1: JOURNEY (DEFAULT VIEW) ================= -->
-        <section id="view-journey" class="tab-view active">
-            <div class="section-intro">
-                <h2>Your Trivia Journey</h2>
-                <p>Complete levels to earn XP and unlock higher tiers.</p>
-            </div>
-
-            <!-- TIER 1 -->
-            <div class="tier-card active-tier">
-                <div class="tier-header">
-                    <h3><i class="fa-solid fa-graduation-cap"></i> Tier 1: Novice Pioneer</h3>
-                    <span class="tier-status">Progress: 3/5</span>
-                </div>
-                <div class="level-grid">
-                    <div class="level-node completed">
-                        <span class="lvl-num">1</span>
-                        <i class="fa-solid fa-circle-check check-icon"></i>
-                    </div>
-                    <div class="level-node completed">
-                        <span class="lvl-num">2</span>
-                        <i class="fa-solid fa-circle-check check-icon"></i>
-                    </div>
-                    <div class="level-node active">
-                        <span class="lvl-num">3</span>
-                    </div>
-                    <div class="level-node locked">
-                        <span class="lvl-num">4</span>
-                        <i class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                    <div class="level-node locked">
-                        <span class="lvl-num">5</span>
-                        <i class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TIER 2 (LOCKED) -->
-            <div class="tier-card locked-tier">
-                <div class="tier-header">
-                    <h3><i class="fa-solid fa-compass"></i> Tier 2: Global Explorer</h3>
-                    <span class="unlock-badge"><i class="fa-solid fa-lock"></i> Unlocks at Level 6</span>
-                </div>
-                <p class="tier-desc">Faster timers (8s) and advanced global geography/history questions.</p>
-                <button class="btn-bypass"><i class="fa-solid fa-bolt"></i> Instant Unlock for 0.05 Pi</button>
-            </div>
-        </section>
-
-        <!-- ================= TAB 2: ARENA (WAGERS) ================= -->
-        <section id="view-arena" class="tab-view">
-            <div class="section-intro">
-                <h2>The Wager Arena</h2>
-                <p>Clash with real Pioneers worldwide. Winner takes the pot!</p>
-            </div>
-
-            <div class="arena-matchmaking">
-                <div class="wager-card">
-                    <div class="wager-info">
-                        <h4>Classic Clash</h4>
-                        <p>5 Global Questions • 10s Timer</p>
-                    </div>
-                    <div class="wager-action">
-                        <button class="btn-wager">Stake 0.1 Pi</button>
-                    </div>
-                </div>
-
-                <div class="wager-card high-stakes">
-                    <div class="wager-info">
-                        <h4>Titan Showdown</h4>
-                        <p>5 Hard Questions • 8s Timer</p>
-                    </div>
-                    <div class="wager-action">
-                        <button class="btn-wager gold">Stake 0.5 Pi</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 3: VAULT (STORE) ================= -->
-        <section id="view-vault" class="tab-view">
-            <div class="section-intro">
-                <h2>The Vault & Store</h2>
-                <p>Equip items to stay alive in high-tier matching.</p>
-            </div>
-
-            <div class="store-grid">
-                <div class="store-item">
-                    <div class="item-icon"><i class="fa-solid fa-heart-crack"></i></div>
-                    <h4>50/50 Lifeline</h4>
-                    <p>Eliminates 2 wrong answers.</p>
-                    <button class="btn-buy">0.02 Pi</button>
-                </div>
-
-                <div class="store-item">
-                    <div class="item-icon"><i class="fa-solid fa-hourglass-half"></i></div>
-                    <h4>Time Warp</h4>
-                    <p>Adds +5s to your question clock.</p>
-                    <button class="btn-buy">0.02 Pi</button>
-                </div>
-
-                <div class="store-item streak-repair">
-                    <div class="item-icon"><i class="fa-solid fa-kit-medical"></i></div>
-                    <h4>Streak Repair Kit</h4>
-                    <p>Save a broken daily streak.</p>
-                    <button class="btn-buy">0.05 Pi</button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- BOTTOM NAVIGATION BAR -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('journey')">
-            <i class="fa-solid fa-map-signs"></i>
-            <span>Journey</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('arena')">
-            <i class="fa-solid fa-swords"></i>
-            <span>Arena</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('vault')">
-            <i class="fa-solid fa-vault"></i>
-            <span>Vault</span>
-        </button>
-    </nav>
-
-    <script>
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            
-            document.getElementById('view-' + tabName).classList.add('active');
-            
-            // Handle unique tab click state focus
-            if(event) {
-                event.currentTarget.classList.add('active');
-            }
-        }
-    </script>
     <script src="app.js"></script>
 </body>
 </html>
