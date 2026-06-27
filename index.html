@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI</title>
-    <!-- Include the official Pi Network SDK -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
         body {
@@ -12,90 +11,154 @@
             background-color: #0d0e15;
             color: #ffffff;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         .container {
             max-width: 600px;
             width: 100%;
             background: #161925;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
             text-align: center;
             border: 1px solid #2a2e45;
+            box-sizing: border-box;
         }
         h1 {
             color: #00ffcc;
-            margin-bottom: 5px;
-            font-size: 2rem;
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0,255,204,0.3);
         }
         .status-badge {
             display: inline-block;
             background: #23273a;
             color: #00ffcc;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: bold;
             margin-bottom: 20px;
+            border: 1px solid #3d4363;
         }
         .welcome-msg {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
             color: #ffffff;
+            font-weight: bold;
         }
         .instructions {
             color: #8a92b2;
-            font-size: 0.95rem;
-            margin-bottom: 25px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
         }
         .node-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 15px;
         }
         .node-card {
             background: #202438;
             border: 2px solid #2a2e45;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            text-align: left;
         }
         .node-card:hover {
             border-color: #00ffcc;
-            transform: translateY(-3px);
             background: #252b47;
+            transform: translateY(-2px);
         }
         .node-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             color: #fff;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .node-meta {
             font-size: 0.8rem;
             color: #00ffcc;
+            background: rgba(0,255,204,0.1);
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
         #signin-btn {
             background: linear-gradient(135deg, #00ffcc, #00bfff);
             color: #0d0e15;
             border: none;
-            padding: 12px 30px;
+            padding: 14px 35px;
             font-size: 1rem;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,255,204,0.3);
+            box-shadow: 0 4px 15px rgba(0,255,204,0.4);
+            margin-top: 10px;
         }
-        #game-arena {
+        #game-arena, #quiz-panel, #score-screen {
             display: none;
+        }
+        /* Quiz Window Styling */
+        .quiz-box {
+            background: #1f2336;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #3d4363;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .timer-bar {
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        .option-btn {
+            background: #282e4a;
+            border: 1px solid #414973;
+            color: #fff;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .option-btn:hover {
+            background: #343c61;
+            border-color: #00ffcc;
+        }
+        .score-title {
+            font-size: 1.8rem;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        .restart-btn {
+            background: #23273a;
+            color: #fff;
+            border: 1px solid #00ffcc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -103,35 +166,203 @@
 
     <div class="container">
         <h1>SkillClash AI</h1>
-        <div id="auth-status" class="status-badge">Initializing SDK...</div>
+        <div id="auth-status" class="status-badge">Connecting to Pi...</div>
         
-        <button id="signin-btn" style="display: none;">Sign In with Pi</button>
+        <button id="signin-btn" onclick="handlePiAuthentication()">Sign In with Pi</button>
 
-        <!-- Hidden until user is authenticated -->
         <div id="game-arena">
             <div class="welcome-msg">Welcome, <span id="player-username">Pioneer</span>!</div>
-            <div class="instructions">Select a node to begin tournament trivia.</div>
+            <div class="instructions">Select an active tournament node below:</div>
             
             <div class="node-grid">
-                <div class="node-card" onclick="alert('Entering Tech Trivia...')">
+                <div class="node-card" onclick="startQuiz('AI & Tech')">
                     <div class="node-title">🤖 AI & Tech</div>
-                    <div class="node-meta">Entry: 0.1 Pi</div>
+                    <div class="node-meta">Free Testing Node</div>
                 </div>
-                <div class="node-card" onclick="alert('Entering Crypto Trivia...')">
+                <div class="node-card" onclick="startQuiz('Web3 & Crypto')">
                     <div class="node-title">⚡ Web3 & Crypto</div>
-                    <div class="node-meta">Entry: 0.1 Pi</div>
+                    <div class="node-meta">Free Testing Node</div>
                 </div>
-                <div class="node-card" onclick="alert('Entering Pop Culture Trivia...')">
+                <div class="node-card" onclick="startQuiz('Pop Culture')">
                     <div class="node-title">🎬 Pop Culture</div>
-                    <div class="node-meta">Entry: 0.05 Pi</div>
+                    <div class="node-meta">Free Testing Node</div>
                 </div>
-                <div class="node-card" onclick="alert('Entering Speed Round Trivia...')">
+                <div class="node-card" onclick="startQuiz('Speed Round')">
                     <div class="node-title">⏱️ Speed Round</div>
-                    <div class="node-meta">Entry: 0.2 Pi</div>
+                    <div class="node-meta">Free Testing Node</div>
                 </div>
             </div>
         </div>
+
+        <div id="quiz-panel">
+            <div class="quiz-box">
+                <div id="timer" class="timer-bar">⏱️ Time Left: 15s</div>
+                <div id="question" class="question-text">Loading question...</div>
+                <div id="options-container"></div>
+            </div>
+        </div>
+
+        <div id="score-screen">
+            <div class="score-title">🎉 Round Complete!</div>
+            <p style="font-size: 1.2rem;">Your Score: <span id="final-score" style="color:#00ffcc; font-weight:bold;">0</span> / 3</p>
+            <p id="reward-status" style="color: #8a92b2; font-size: 0.9rem;"></p>
+            <button class="restart-btn" onclick="returnToLobby()">Return to Tournament Lobby</button>
+        </div>
     </div>
 
+    <script>
+        const authStatus = document.getElementById("auth-status");
+        const signinBtn = document.getElementById("signin-btn");
+        const gameArena = document.getElementById("game-arena");
+        const quizPanel = document.getElementById("quiz-panel");
+        const scoreScreen = document.getElementById("score-screen");
+        const playerUsername = document.getElementById("player-username");
+
+        // Simple Localized Test Pool Questions Data Base
+        const quizDatabase = {
+            "AI & Tech": [
+                { q: "What does AI stand for?", o: ["Artificial Intelligence", "Advanced Integration", "Automated Internet"], a: 0 },
+                { q: "Which company created the popular ChatGPT conversational model?", o: ["Google", "OpenAI", "Microsoft"], a: 1 },
+                { q: "What is the core brain component of a computer system?", o: ["RAM", "Hard Drive", "CPU"], a: 2 }
+            ],
+            "Web3 & Crypto": [
+                { q: "Who created Bitcoin?", o: ["Satoshi Nakamoto", "Vitalik Buterin", "Elon Musk"], a: 0 },
+                { q: "What ecosystem architecture is the Pi Network built on?", o: ["Stellar Consensus Protocol", "Proof of Work", "Proof of Stake"], a: 0 },
+                { q: "What is a decentralized application commonly called?", o: ["SaaS", "dApp", "API"], a: 1 }
+            ],
+            "Pop Culture": [
+                { q: "Which character says 'I am Iron Man'?", o: ["Captain America", "Thor", "Tony Stark"], a: 2 },
+                { q: "What is the highest-grossing movie of all time?", o: ["Avatar", "Titanic", "Avengers: Endgame"], a: 0 },
+                { q: "How many members are in the K-pop group BTS?", o: ["5", "7", "9"], a: 1 }
+            ],
+            "Speed Round": [
+                { q: "Is water wet?", o: ["Yes", "No", "It's a chemical property debate"], a: 0 },
+                { q: "What is 2 + 2 * 2?", o: ["8", "6", "4"], a: 1 },
+                { q: "Which planet is closest to the Sun?", o: ["Venus", "Mars", "Mercury"], a: 2 }
+            ]
+        };
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft = 15;
+
+        // Automatically trigger authentication when app loads
+        document.addEventListener("DOMContentLoaded", () => {
+            initializePiSDK();
+        });
+
+        async function initializePiSDK() {
+            try {
+                authStatus.textContent = "Initializing SDK...";
+                await Pi.init({ version: "2.0", sandbox: true });
+                console.log("Pi SDK configured successfully.");
+                await handlePiAuthentication();
+            } catch (error) {
+                console.error("Pi SDK configuration failed:", error);
+                authStatus.textContent = "Use Pi Browser App to Play";
+            }
+        }
+
+        async function handlePiAuthentication() {
+            authStatus.textContent = "Authenticating User...";
+            signinBtn.style.display = "none";
+
+            try {
+                const scopes = ["username"];
+                function onIncompletePaymentFound(payment) { console.log("Unsettled ledger item:", payment); }
+
+                const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                
+                // Set UI parameters directly
+                authStatus.textContent = "Verified Pioneer";
+                playerUsername.textContent = authResult.user.username;
+                gameArena.style.display = "block";
+            } catch (error) {
+                console.error("Authentication rejected:", error);
+                authStatus.textContent = "Authentication Failed";
+                signinBtn.style.display = "inline-block";
+            }
+        }
+
+        function startQuiz(category) {
+            gameArena.style.display = "none";
+            scoreScreen.style.display = "none";
+            quizPanel.style.display = "block";
+            
+            currentQuestions = quizDatabase[category];
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            if (currentQuestionIndex >= currentQuestions.length) {
+                showResults();
+                return;
+            }
+
+            timeLeft = 15;
+            document.getElementById("timer").textContent = `⏱️ Time Left: ${timeLeft}s`;
+            
+            // Countdown setup
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer").textContent = `⏱️ Time Left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    nextQuestion();
+                }
+            }, 1000);
+
+            const qData = currentQuestions[currentQuestionIndex];
+            document.getElementById("question").textContent = qData.q;
+            
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            qData.o.forEach((option, index) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            const qData = currentQuestions[currentQuestionIndex];
+            if (selectedIndex === qData.a) {
+                score++;
+            }
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            quizPanel.style.display = "none";
+            scoreScreen.style.display = "block";
+            document.getElementById("final-score").textContent = score;
+            
+            const rewardStatus = document.getElementById("reward-status");
+            if (score === 3) {
+                rewardStatus.textContent = "🎯 Perfect score! Ready to risk real Pi in Mainnet challenges.";
+            } else {
+                rewardStatus.textContent = "Good try! Sharpen those skills to earn top payouts.";
+            }
+        }
+
+        function returnToLobby() {
+            scoreScreen.style.display = "none";
+            gameArena.style.display = "block";
+        }
+    </script>
 </body>
 </html>
