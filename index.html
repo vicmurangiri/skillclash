@@ -3,366 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillClash AI</title>
+    <title>SkillClash AI Hub</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
+        :root {
+            --bg-dark: #070810;
+            --panel-bg: rgba(18, 22, 39, 0.85);
+            --neon-cyan: #00ffcc;
+            --neon-blue: #00bfff;
+            --neon-purple: #9d4edd;
+            --neon-pink: #ff007f;
+            --text-main: #f0f3ff;
+            --text-muted: #6e789e;
+            --border-glow: rgba(0, 255, 204, 0.2);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0d0e15;
-            color: #ffffff;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 191, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(157, 78, 221, 0.08) 0%, transparent 40%);
+            color: var(--text-main);
             margin: 0;
             padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-        }
-        .container {
-            max-width: 600px;
-            width: 100%;
-            background: #161925;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
-            text-align: center;
-            border: 1px solid #2a2e45;
             box-sizing: border-box;
         }
-        h1 {
-            color: #00ffcc;
-            margin: 0 0 5px 0;
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0,255,204,0.3);
-        }
-        .status-badge {
-            display: inline-block;
-            background: #23273a;
-            color: #00ffcc;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border: 1px solid #3d4363;
-        }
-        .welcome-msg {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-            color: #ffffff;
-            font-weight: bold;
-        }
-        .instructions {
-            color: #8a92b2;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-        .node-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 15px;
-        }
-        .node-card {
-            background: #202438;
-            border: 2px solid #2a2e45;
-            border-radius: 12px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            text-align: left;
-        }
-        .node-card:hover {
-            border-color: #00ffcc;
-            background: #252b47;
-            transform: translateY(-2px);
-        }
-        .node-title {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 6px;
-        }
-        .node-meta {
-            font-size: 0.8rem;
-            color: #00ffcc;
-            background: rgba(0,255,204,0.1);
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        #signin-btn {
-            background: linear-gradient(135deg, #00ffcc, #00bfff);
-            color: #0d0e15;
-            border: none;
-            padding: 14px 35px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,255,204,0.4);
-            margin-top: 10px;
-        }
-        #game-arena, #quiz-panel, #score-screen {
-            display: none;
-        }
-        /* Quiz Window Styling */
-        .quiz-box {
-            background: #1f2336;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #3d4363;
-            margin-top: 10px;
-            text-align: left;
-        }
-        .timer-bar {
-            color: #ffcc00;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 10px;
-            text-align: right;
-        }
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        .option-btn {
-            background: #282e4a;
-            border: 1px solid #414973;
-            color: #fff;
+
+        .container {
+            max-width: 500px;
             width: 100%;
-            padding: 12px 15px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 255, 204, 0.05);
+            text-align: center;
+            border: 1px solid rgba(43, 50, 82, 0.6);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- LOGO ENGINE (GRAPHIC DESIGN OVERHAUL) --- */
+        .logo-container {
             margin-bottom: 10px;
-            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-logo-svg {
+            width: 70px;
+            height: 70px;
+            filter: drop-shadow(0 0 12px var(--neon-cyan));
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        .brand-title {
+            font-size: 2.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--neon-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 8px 0 2px 0;
+        }
+
+        @keyframes pulseGlow {
+            0% { filter: drop-shadow(0 0 8px var(--neon-cyan)); transform: scale(1); }
+            100% { filter: drop-shadow(0 0 18px var(--neon-blue)); transform: scale(1.03); }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(13, 16, 29, 0.8);
+            color: var(--neon-cyan);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* --- PLAYER PROFILE CARD (IDENTITY POD) --- */
+        .player-card {
+            background: linear-gradient(135deg, rgba(24, 28, 47, 0.9), rgba(14, 17, 31, 0.9));
+            border-left: 4px solid var(--neon-blue);
+            border-radius: 14px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             text-align: left;
-            font-size: 0.95rem;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+        }
+
+        .player-info h3 {
+            margin: 0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .player-info div {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+        }
+
+        /* --- MODE SELECTION SECTIONS --- */
+        .mode-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .mode-card {
+            background: rgba(24, 28, 47, 0.5);
+            border: 1px solid rgba(62, 72, 117, 0.4);
+            border-radius: 16px;
+            padding: 18px;
             cursor: pointer;
-            transition: background 0.2s;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
-        .option-btn:hover {
-            background: #343c61;
-            border-color: #00ffcc;
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 16px;
+            box-shadow: 0 0 15px transparent;
+            transition: all 0.25s;
+            pointer-events: none;
         }
-        .score-title {
-            font-size: 1.8rem;
-            color: #ffcc00;
-            margin-bottom: 10px;
+
+        .mode-card:hover {
+            background: rgba(32, 38, 64, 0.8);
+            transform: translateX(4px);
         }
-        .restart-btn {
-            background: #23273a;
-            color: #fff;
-            border: 1px solid #00ffcc;
-            padding: 10px 20px;
-            border-radius: 6px;
+
+        .mode-card.trivia:hover { border-color: var(--neon-cyan); }
+        .mode-card.trivia:hover::before { box-shadow: 0 0 15px rgba(0, 255, 204, 0.15); }
+        
+        .mode-card.puzzle:hover { border-color: var(--neon-blue); }
+        .mode-card.puzzle:hover::before { box-shadow: 0 0 15px rgba(0, 191, 255, 0.15); }
+
+        .mode-card.reflex:hover { border-color: var(--neon-purple); }
+        .mode-card.reflex:hover::before { box-shadow: 0 0 15px rgba(157, 78, 221, 0.15); }
+
+        .mode-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* --- GENERAL MECHANICS --- */
+        .screen { display: none; }
+        .active-screen { display: block; }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            color: #05060a;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            margin-top: 15px;
+            box-shadow: 0 8px 20px rgba(0, 255, 204, 0.2);
+        }
+
+        /* --- REFLEX TAP CONFIGURATION --- */
+        .reflex-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .reflex-node {
+            aspect-ratio: 1;
+            background: rgba(16, 19, 35, 0.7);
+            border: 1px solid rgba(62, 72, 117, 0.4);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.05s ease;
+        }
+
+        .reflex-node.active {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            box-shadow: 0 0 25px var(--neon-pink);
+            border-color: #ffffff;
+            transform: scale(0.96);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>SkillClash AI</h1>
-        <div id="auth-status" class="status-badge">Connecting to Pi...</div>
-        
-        <button id="signin-btn" onclick="handlePiAuthentication()">Sign In with Pi</button>
+        <!-- HERO GRAPHIC LOGO BRANDING -->
+        <div class="logo-container">
+            <!-- Vector Cyber-Crown / Diamond Shield Logo Grid -->
+            <svg class="brand-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5L85 25V65L50 95L15 65V25L50 5Z" stroke="#00ffcc" stroke-width="3" fill="rgba(0, 255, 204, 0.03)"/>
+                <path d="M50 20L73 35V57L50 78L27 57V35L50 20Z" fill="url(#logo-grad)" opacity="0.8"/>
+                <circle cx="50" cy="48" r="8" fill="#ffffff" filter="drop-shadow(0 0 5px #fff)"/>
+                <defs>
+                    <linearGradient id="logo-grad" x1="50" y1="20" x2="50" y2="78" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#00ffcc"/>
+                        <stop offset="1" stop-color="#00bfff"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div class="brand-title">SkillClash AI</div>
+        </div>
 
-        <div id="game-arena">
-            <div class="welcome-msg">Welcome, <span id="player-username">Pioneer</span>!</div>
-            <div class="instructions">Select an active tournament node below:</div>
+        <div id="auth-status" class="status-badge">
+            <div class="status-dot"></div>
+            <span>Synchronizing Matrix</span>
+        </div>
+
+        <!-- SCREEN 0: PREMIUM LOBBY INTERFACE -->
+        <div id="screen-lobby" class="screen active-screen">
+            <!-- DESIGNER IDENTIFICATION POD -->
+            <div class="player-card">
+                <div class="player-info">
+                    <h3>Authenticated Pioneer</h3>
+                    <div id="player-username">Connecting...</div>
+                </div>
+                <div style="font-size: 1.5rem; filter: drop-shadow(0 0 4px var(--neon-blue));">🛡️</div>
+            </div>
             
-            <div class="node-grid">
-                <div class="node-card" onclick="startQuiz('AI & Tech')">
-                    <div class="node-title">🤖 AI & Tech</div>
-                    <div class="node-meta">Free Testing Node</div>
+            <div class="mode-grid">
+                <div class="mode-card trivia" onclick="launchTrivia()">
+                    <div class="mode-title" style="color: var(--neon-cyan);">🤖 AI Trivia Arena</div>
+                    <div class="mode-desc">High-speed cognitive battles. Chain together instant correct inputs to activate multi-streak point boosts.</div>
                 </div>
-                <div class="node-card" onclick="startQuiz('Web3 & Crypto')">
-                    <div class="node-title">⚡ Web3 & Crypto</div>
-                    <div class="node-meta">Free Testing Node</div>
+                <div class="mode-card puzzle" onclick="launchPuzzle()">
+                    <div class="mode-title" style="color: var(--neon-blue);">🧩 Word Scramble Matrix</div>
+                    <div class="mode-desc">Deconstruct scrambled algorithmic string matrices back into fully verified vocab keys against a depleting timer.</div>
                 </div>
-                <div class="node-card" onclick="startQuiz('Pop Culture')">
-                    <div class="node-title">🎬 Pop Culture</div>
-                    <div class="node-meta">Free Testing Node</div>
-                </div>
-                <div class="node-card" onclick="startQuiz('Speed Round')">
-                    <div class="node-title">⏱️ Speed Round</div>
-                    <div class="node-meta">Free Testing Node</div>
+                <div class="mode-card reflex" onclick="launchReflex()">
+                    <div class="mode-title" style="color: var(--neon-purple);">⚡ Reflex Node Tap</div>
+                    <div class="mode-desc">Pure kinetic speed optimization. Terminate localized visual neural targets instantly upon ignition.</div>
                 </div>
             </div>
         </div>
 
-        <div id="quiz-panel">
-            <div class="quiz-box">
-                <div id="timer" class="timer-bar">⏱️ Time Left: 15s</div>
-                <div id="question" class="question-text">Loading question...</div>
-                <div id="options-container"></div>
+        <!-- SCREEN 1: REFLEX ARENA -->
+        <div id="screen-reflex" class="screen">
+            <div class="game-header">
+                <span style="color: var(--neon-purple);">⚡ Reflex Node Tap</span>
+                <span id="reflex-score" style="color: var(--neon-pink);">Score: 0</span>
+            </div>
+            <div class="reflex-grid">
+                <div class="reflex-node" id="node-0" onclick="tapNode(0)"></div>
+                <div class="reflex-node" id="node-1" onclick="tapNode(1)"></div>
+                <div class="reflex-node" id="node-2" onclick="tapNode(2)"></div>
+                <div class="reflex-node" id="node-3" onclick="tapNode(3)"></div>
+                <div class="reflex-node" id="node-4" onclick="tapNode(4)"></div>
+                <div class="reflex-node" id="node-5" onclick="tapNode(5)"></div>
+                <div class="reflex-node" id="node-6" onclick="tapNode(6)"></div>
+                <div class="reflex-node" id="node-7" onclick="tapNode(7)"></div>
+                <div class="reflex-node" id="node-8" onclick="tapNode(8)"></div>
             </div>
         </div>
 
-        <div id="score-screen">
-            <div class="score-title">🎉 Round Complete!</div>
-            <p style="font-size: 1.2rem;">Your Score: <span id="final-score" style="color:#00ffcc; font-weight:bold;">0</span> / 3</p>
-            <p id="reward-status" style="color: #8a92b2; font-size: 0.9rem;"></p>
-            <button class="restart-btn" onclick="returnToLobby()">Return to Tournament Lobby</button>
+        <!-- SCREEN 2: POST-GAME EVALUATION -->
+        <div id="screen-results" class="screen">
+            <div style="font-size: 1.8rem; font-weight: 900; color: var(--neon-cyan); margin-bottom: 10px; letter-spacing: 1px;">MATCH CONCLUDED</div>
+            <p style="font-size: 1.1rem; color: var(--text-muted);">Performance Rating Matrix Output:</p>
+            <div style="font-size: 3rem; font-weight: 900; color: #ffffff; margin: 15px 0 30px 0; text-shadow: 0 0 20px var(--neon-blue);"><span id="display-final-score">0</span> <span style="font-size:1.2rem; color:var(--text-muted)">PTS</span></div>
+            <button class="btn-action" onclick="returnToLobby()">Return to Arena Lobby</button>
         </div>
     </div>
 
     <script>
-        const authStatus = document.getElementById("auth-status");
-        const signinBtn = document.getElementById("signin-btn");
-        const gameArena = document.getElementById("game-arena");
-        const quizPanel = document.getElementById("quiz-panel");
-        const scoreScreen = document.getElementById("score-screen");
-        const playerUsername = document.getElementById("player-username");
+        let activeNodeIndex = -1;
+        let reflexScore = 0;
+        let reflexTimer;
+        let totalHits = 0;
 
-        // Simple Localized Test Pool Questions Data Base
-        const quizDatabase = {
-            "AI & Tech": [
-                { q: "What does AI stand for?", o: ["Artificial Intelligence", "Advanced Integration", "Automated Internet"], a: 0 },
-                { q: "Which company created the popular ChatGPT conversational model?", o: ["Google", "OpenAI", "Microsoft"], a: 1 },
-                { q: "What is the core brain component of a computer system?", o: ["RAM", "Hard Drive", "CPU"], a: 2 }
-            ],
-            "Web3 & Crypto": [
-                { q: "Who created Bitcoin?", o: ["Satoshi Nakamoto", "Vitalik Buterin", "Elon Musk"], a: 0 },
-                { q: "What ecosystem architecture is the Pi Network built on?", o: ["Stellar Consensus Protocol", "Proof of Work", "Proof of Stake"], a: 0 },
-                { q: "What is a decentralized application commonly called?", o: ["SaaS", "dApp", "API"], a: 1 }
-            ],
-            "Pop Culture": [
-                { q: "Which character says 'I am Iron Man'?", o: ["Captain America", "Thor", "Tony Stark"], a: 2 },
-                { q: "What is the highest-grossing movie of all time?", o: ["Avatar", "Titanic", "Avengers: Endgame"], a: 0 },
-                { q: "How many members are in the K-pop group BTS?", o: ["5", "7", "9"], a: 1 }
-            ],
-            "Speed Round": [
-                { q: "Is water wet?", o: ["Yes", "No", "It's a chemical property debate"], a: 0 },
-                { q: "What is 2 + 2 * 2?", o: ["8", "6", "4"], a: 1 },
-                { q: "Which planet is closest to the Sun?", o: ["Venus", "Mars", "Mercury"], a: 2 }
-            ]
-        };
-
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let timerInterval;
-        let timeLeft = 15;
-
-        // Automatically trigger authentication when app loads
         document.addEventListener("DOMContentLoaded", () => {
-            initializePiSDK();
+            initializePiHub();
         });
 
-        async function initializePiSDK() {
+        async function initializePiHub() {
             try {
-                authStatus.textContent = "Initializing SDK...";
                 await Pi.init({ version: "2.0", sandbox: true });
-                console.log("Pi SDK configured successfully.");
-                await handlePiAuthentication();
-            } catch (error) {
-                console.error("Pi SDK configuration failed:", error);
-                authStatus.textContent = "Use Pi Browser App to Play";
-            }
-        }
-
-        async function handlePiAuthentication() {
-            authStatus.textContent = "Authenticating User...";
-            signinBtn.style.display = "none";
-
-            try {
                 const scopes = ["username"];
-                function onIncompletePaymentFound(payment) { console.log("Unsettled ledger item:", payment); }
-
-                const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                function onIncompletePaymentFound(p) {}
+                const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
                 
-                // Set UI parameters directly
-                authStatus.textContent = "Verified Pioneer";
-                playerUsername.textContent = authResult.user.username;
-                gameArena.style.display = "block";
-            } catch (error) {
-                console.error("Authentication rejected:", error);
-                authStatus.textContent = "Authentication Failed";
-                signinBtn.style.display = "inline-block";
+                document.getElementById("auth-status").innerHTML = '<div class="status-dot"></div><span>Verified Nexus</span>';
+                document.getElementById("player-username").textContent = auth.user.username;
+            } catch (e) {
+                document.getElementById("auth-status").innerHTML = '<div class="status-dot" style="background:#ff007f; box-shadow:0 0 8px #ff007f;"></div><span>Local Override</span>';
+                document.getElementById("player-username").textContent = "Pioneer_Test_Mode";
             }
         }
 
-        function startQuiz(category) {
-            gameArena.style.display = "none";
-            scoreScreen.style.display = "none";
-            quizPanel.style.display = "block";
-            
-            currentQuestions = quizDatabase[category];
-            currentQuestionIndex = 0;
-            score = 0;
-            
-            loadQuestion();
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(screenId).classList.add('active-screen');
         }
 
-        function loadQuestion() {
-            clearInterval(timerInterval);
-            if (currentQuestionIndex >= currentQuestions.length) {
-                showResults();
+        function launchReflex() {
+            switchScreen('screen-reflex');
+            reflexScore = 0;
+            totalHits = 0;
+            document.getElementById("reflex-score").textContent = "Score: 0";
+            nextReflexCycle();
+        }
+
+        function nextReflexCycle() {
+            if(activeNodeIndex !== -1) {
+                document.getElementById(`node-${activeNodeIndex}`).classList.remove('active');
+            }
+
+            if(totalHits >= 12) {
+                endGame(reflexScore);
                 return;
             }
 
-            timeLeft = 15;
-            document.getElementById("timer").textContent = `⏱️ Time Left: ${timeLeft}s`;
-            
-            // Countdown setup
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById("timer").textContent = `⏱️ Time Left: ${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    nextQuestion();
-                }
-            }, 1000);
+            activeNodeIndex = Math.floor(Math.random() * 9);
+            document.getElementById(`node-${activeNodeIndex}`).classList.add('active');
 
-            const qData = currentQuestions[currentQuestionIndex];
-            document.getElementById("question").textContent = qData.q;
-            
-            const optionsContainer = document.getElementById("options-container");
-            optionsContainer.innerHTML = "";
-            
-            qData.o.forEach((option, index) => {
-                const btn = document.createElement("button");
-                btn.className = "option-btn";
-                btn.textContent = option;
-                btn.onclick = () => selectAnswer(index);
-                optionsContainer.appendChild(btn);
-            });
+            clearTimeout(reflexTimer);
+            reflexTimer = setTimeout(() => {
+                totalHits++;
+                nextReflexCycle();
+            }, 800);
         }
 
-        function selectAnswer(selectedIndex) {
-            const qData = currentQuestions[currentQuestionIndex];
-            if (selectedIndex === qData.a) {
-                score++;
+        function tapNode(index) {
+            if(index === activeNodeIndex) {
+                reflexScore += 10;
+                document.getElementById("reflex-score").textContent = `Score: ${reflexScore}`;
+                totalHits++;
+                nextReflexCycle();
             }
-            nextQuestion();
         }
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            loadQuestion();
-        }
-
-        function showResults() {
-            clearInterval(timerInterval);
-            quizPanel.style.display = "none";
-            scoreScreen.style.display = "block";
-            document.getElementById("final-score").textContent = score;
-            
-            const rewardStatus = document.getElementById("reward-status");
-            if (score === 3) {
-                rewardStatus.textContent = "🎯 Perfect score! Ready to risk real Pi in Mainnet challenges.";
-            } else {
-                rewardStatus.textContent = "Good try! Sharpen those skills to earn top payouts.";
+        function endGame(score) {
+            clearTimeout(reflexTimer);
+            if(activeNodeIndex !== -1) {
+                document.getElementById(`node-${activeNodeIndex}`).classList.remove('active');
             }
+            document.getElementById("display-final-score").textContent = score;
+            switchScreen('screen-results');
         }
 
         function returnToLobby() {
-            scoreScreen.style.display = "none";
-            gameArena.style.display = "block";
+            switchScreen('screen-lobby');
         }
+
+        function launchTrivia() { alert("Launching Upgraded Trivia Engine soon!"); }
+        function launchPuzzle() { alert("Launching Cryptographic Word Matrix soon!"); }
     </script>
 </body>
 </html>
