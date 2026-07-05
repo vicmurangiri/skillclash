@@ -124,11 +124,7 @@
             color: var(--text-muted);
         }
 
-        .player-info div {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
+        .player-info div { font-size: 1.2rem; font-weight: 700; color: #ffffff; }
 
         .mode-grid { display: flex; flex-direction: column; gap: 14px; }
 
@@ -141,12 +137,7 @@
             text-align: left;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .mode-card:hover {
-            background: rgba(32, 38, 64, 0.8);
-            transform: translateX(4px);
-        }
-
+        .mode-card:hover { background: rgba(32, 38, 64, 0.8); transform: translateX(4px); }
         .mode-card.trivia:hover { border-color: var(--neon-cyan); }
         .mode-card.puzzle:hover { border-color: var(--neon-blue); }
         .mode-card.reflex:hover { border-color: var(--neon-purple); }
@@ -179,37 +170,21 @@
             cursor: pointer;
         }
 
-        /* --- REFLEX GRID --- */
+        /* --- REFLEX --- */
         .reflex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 25px 0; }
         .reflex-node { aspect-ratio: 1; background: rgba(16, 19, 35, 0.7); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 16px; cursor: pointer; }
         .reflex-node.active { background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); box-shadow: 0 0 25px var(--neon-pink); border-color: #ffffff; }
 
-        /* --- PUZZLE INTERFACE STYLING --- */
-        .scramble-box {
-            font-size: 2.5rem;
-            font-weight: 900;
-            letter-spacing: 6px;
-            color: var(--neon-blue);
-            text-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
-            margin: 20px 0;
-            text-transform: uppercase;
-        }
-
-        .matrix-input {
-            width: 100%;
-            padding: 16px;
-            background: #0d101d;
-            border: 2px solid #232946;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 1.2rem;
-            text-align: center;
-            outline: none;
-            box-sizing: border-box;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
+        /* --- WORD MATRIX --- */
+        .scramble-box { font-size: 2.5rem; font-weight: 900; letter-spacing: 6px; color: var(--neon-blue); text-shadow: 0 0 15px rgba(0, 191, 255, 0.4); margin: 20px 0; text-transform: uppercase; }
+        .matrix-input { width: 100%; padding: 16px; background: #0d101d; border: 2px solid #232946; border-radius: 12px; color: #fff; font-size: 1.2rem; text-align: center; outline: none; box-sizing: border-box; text-transform: uppercase; margin-bottom: 15px; }
         .matrix-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 191, 255, 0.2); }
+
+        /* --- TRIVIA ARENA STYLING --- */
+        .trivia-question { font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 20px 0; line-height: 1.4; text-align: left; }
+        .trivia-options-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .option-btn { width: 100%; padding: 14px 18px; background: rgba(24, 28, 47, 0.6); border: 1px solid rgba(62, 72, 117, 0.5); border-radius: 12px; color: #fff; text-align: left; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .option-btn:hover { background: rgba(0, 255, 204, 0.1); border-color: var(--neon-cyan); color: var(--neon-cyan); }
     </style>
 </head>
 <body>
@@ -291,7 +266,17 @@
             <button class="btn-action" onclick="submitPuzzleAnswer()" style="margin-bottom: 10px;">Verify Entry</button>
         </div>
 
-        <!-- SCREEN 3: RESULTS EVALUATION -->
+        <!-- SCREEN 3: TRIVIA ARENA -->
+        <div id="screen-trivia" class="screen">
+            <div class="game-header">
+                <span style="color: var(--neon-cyan);">🤖 AI Trivia</span>
+                <span id="trivia-timer" style="color: var(--neon-pink);">Time: 30s</span>
+            </div>
+            <div class="trivia-question" id="question-text">Loading secure prompt...</div>
+            <div class="trivia-options-grid" id="options-box"></div>
+        </div>
+
+        <!-- SCREEN 4: RESULTS -->
         <div id="screen-results" class="screen">
             <div style="font-size: 1.8rem; font-weight: 900; color: var(--neon-cyan); margin-bottom: 10px; letter-spacing: 1px;">MATCH CONCLUDED</div>
             <div style="font-size: 3rem; font-weight: 900; color: #ffffff; margin: 15px 0 30px 0; text-shadow: 0 0 20px var(--neon-blue);"><span id="display-final-score">0</span> <span style="font-size:1.2rem; color:var(--text-muted)">PTS</span></div>
@@ -300,27 +285,29 @@
     </div>
 
     <script>
-        // Game state variables
         let activeNodeIndex = -1;
         let gameScore = 0;
         let reflexTimer;
-        let puzzleInterval;
+        let countdownInterval;
         let totalHits = 0;
         let timeLeft = 30;
         let currentTargetWord = "";
+        let currentTriviaIndex = 0;
 
         const wordRepository = ["BLOCKCHAIN", "CRYPTO", "PIONEER", "NETWORK", "SECURITY", "MATRIX", "MINING", "VALIDATOR"];
+        
+        const triviaRepository = [
+            { q: "What is the primary mechanism used to secure a blockchain data ledger?", o: ["Proof of Work / Stake", "Central Firewalls", "SQL Encryption Tables", "Cloud Backup Sync"], a: 0 },
+            { q: "Which component executes non-fungible automated logical contracts inside ecosystems?", o: ["Hardware Wallets", "Smart Contracts Engine", "File Allocation Tables", "Peer Domain Routers"], a: 1 },
+            { q: "What process verifies data validity transactions across fully decentralized networks?", o: ["Asynchronous Compiling", "Distributed Consensus", "Localized Kernel Auditing", "Macro Thread Queues"], a: 2 }
+        ];
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initializePiHub();
-        });
+        document.addEventListener("DOMContentLoaded", () => { initializePiHub(); });
 
         async function initializePiHub() {
             try {
                 await Pi.init({ version: "2.0", sandbox: true });
-                const scopes = ["username"];
-                function onIncompletePaymentFound(p) {}
-                const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                const auth = await Pi.authenticate(["username"], function(p){});
                 document.getElementById("auth-status").innerHTML = '<div class="status-dot"></div><span>Verified Nexus</span>';
                 document.getElementById("player-username").textContent = auth.user.username;
             } catch (e) {
@@ -334,6 +321,17 @@
             document.getElementById(screenId).classList.add('active-screen');
         }
 
+        function runGlobalTimer(labelId) {
+            timeLeft = 30;
+            document.getElementById(labelId).textContent = `Time: ${timeLeft}s`;
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById(labelId).textContent = `Time: ${timeLeft}s`;
+                if(timeLeft <= 0) endGame();
+            }, 1000);
+        }
+
         // --- GAME 1: REFLEX ---
         function launchReflex() {
             switchScreen('screen-reflex');
@@ -345,76 +343,78 @@
         function nextReflexCycle() {
             if(activeNodeIndex !== -1) document.getElementById(`node-${activeNodeIndex}`).classList.remove('active');
             if(totalHits >= 12) { endGame(); return; }
-
             activeNodeIndex = Math.floor(Math.random() * 9);
             document.getElementById(`node-${activeNodeIndex}`).classList.add('active');
-
             clearTimeout(reflexTimer);
             reflexTimer = setTimeout(() => { totalHits++; nextReflexCycle(); }, 800);
         }
 
         function tapNode(index) {
-            if(index === activeNodeIndex) {
-                gameScore += 10;
-                document.getElementById("reflex-score").textContent = `Score: ${gameScore}`;
-                totalHits++;
-                nextReflexCycle();
-            }
+            if(index === activeNodeIndex) { gameScore += 10; document.getElementById("reflex-score").textContent = `Score: ${gameScore}`; totalHits++; nextReflexCycle(); }
         }
 
         // --- GAME 2: WORD MATRIX ---
         function launchPuzzle() {
             switchScreen('screen-puzzle');
             gameScore = 0;
-            timeLeft = 30;
             document.getElementById("puzzle-input").value = "";
-            document.getElementById("puzzle-timer").textContent = `Time: ${timeLeft}s`;
-            
             generateNewPuzzleWord();
-            
-            clearInterval(puzzleInterval);
-            puzzleInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById("puzzle-timer").textContent = `Time: ${timeLeft}s`;
-                if(timeLeft <= 0) {
-                    clearInterval(puzzleInterval);
-                    endGame();
-                }
-            }, 1000);
+            runGlobalTimer("puzzle-timer");
         }
 
         function generateNewPuzzleWord() {
             currentTargetWord = wordRepository[Math.floor(Math.random() * wordRepository.length)];
             let scrambled = currentTargetWord.split('').sort(() => Math.random() - 0.5).join('');
-            // Avoid edge case where scramble randomly equals clean word
             if(scrambled === currentTargetWord) scrambled = scrambled.split('').reverse().join('');
             document.getElementById("scrambled-display").textContent = scrambled;
         }
 
         function submitPuzzleAnswer() {
-            const userInput = document.getElementById("puzzle-input").value.trim().toUpperCase();
-            if(userInput === currentTargetWord) {
-                gameScore += 25;
-                document.getElementById("puzzle-input").value = "";
-                generateNewPuzzleWord();
-            } else {
-                // Shake effect or feedback can be added here
-                document.getElementById("puzzle-input").value = "";
-            }
+            if(document.getElementById("puzzle-input").value.trim().toUpperCase() === currentTargetWord) {
+                gameScore += 25; document.getElementById("puzzle-input").value = ""; generateNewPuzzleWord();
+            } else { document.getElementById("puzzle-input").value = ""; }
         }
 
-        // --- HUB CORE FUNCTIONS ---
+        // --- GAME 3: AI TRIVIA ---
+        function launchTrivia() {
+            switchScreen('screen-trivia');
+            gameScore = 0;
+            currentTriviaIndex = 0;
+            renderTriviaQuestion();
+            runGlobalTimer("trivia-timer");
+        }
+
+        function renderTriviaQuestion() {
+            const currentQ = triviaRepository[currentTriviaIndex];
+            document.getElementById("question-text").textContent = currentQ.q;
+            const optionsBox = document.getElementById("options-box");
+            optionsBox.innerHTML = "";
+            
+            currentQ.o.forEach((option, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = `${idx + 1}. ${option}`;
+                btn.onclick = () => selectTriviaOption(idx);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function selectTriviaOption(selectedIdx) {
+            if(selectedIdx === triviaRepository[currentTriviaIndex].a) { gameScore += 30; }
+            currentTriviaIndex = (currentTriviaIndex + 1) % triviaRepository.length;
+            renderTriviaQuestion();
+        }
+
+        // --- HUB CONTROL ---
         function endGame() {
             clearTimeout(reflexTimer);
-            clearInterval(puzzleInterval);
+            clearInterval(countdownInterval);
             if(activeNodeIndex !== -1) document.getElementById(`node-${activeNodeIndex}`).classList.remove('active');
-            
             document.getElementById("display-final-score").textContent = gameScore;
             switchScreen('screen-results');
         }
 
         function returnToLobby() { switchScreen('screen-lobby'); }
-        function launchTrivia() { alert("Launching Upgraded Trivia Engine soon!"); }
     </script>
 </body>
 </html>
