@@ -131,7 +131,6 @@
         .mode-card.m-trivia:hover { border-color: var(--neon-cyan); }
         .mode-card.m-puzzle:hover { border-color: var(--neon-blue); }
         .mode-card.m-reflex:hover { border-color: var(--neon-purple); }
-        .mode-card.m-drop:hover { border-color: var(--neon-orange); }
         .mode-card.m-memory:hover { border-color: var(--neon-yellow); }
         .mode-card.m-dice:hover { border-color: var(--neon-pink); }
         .mode-card.m-linker:hover { border-color: var(--neon-green); }
@@ -165,8 +164,6 @@
         .trivia-options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .option-btn { width: 100%; padding: 12px 15px; background: rgba(20, 24, 43, 0.6); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 10px; color: #fff; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
         .option-btn:hover { background: rgba(0, 255, 204, 0.08); border-color: var(--neon-cyan); color: var(--neon-cyan); }
-
-        canvas { background: #090c15; border: 2px solid rgba(255, 123, 0, 0.3); border-radius: 16px; display: block; margin: 15px auto; max-width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
 
         /* Cyber Dice Styling */
         .dice-board { background: rgba(20, 24, 43, 0.6); border-radius: 16px; padding: 20px; border: 1px solid rgba(255, 0, 127, 0.2); margin: 15px 0; }
@@ -220,10 +217,6 @@
                     <div class="mode-title" style="color: var(--neon-purple);">⚡ Reflex Node Tap</div>
                     <div class="mode-desc">Pure kinetic speed optimization. Terminate localized visual neural targets instantly upon ignition.</div>
                 </div>
-                <div class="mode-card m-drop" onclick="launchPiDrop()">
-                    <div class="mode-title" style="color: var(--neon-orange);">🪙 Pi Drop: Crypto Gravity</div>
-                    <div class="mode-desc">Keep the network node afloat! Dodge market crashes and block structures in an physics gravity arcade.</div>
-                </div>
                 <div class="mode-card m-memory" onclick="launchMemory()">
                     <div class="mode-title" style="color: var(--neon-yellow);">🧠 Memory Node Grid</div>
                     <div class="mode-desc">High-velocity pattern recall. Repeat the pulsing algorithmic flashing nodes sequence perfectly.</div>
@@ -270,14 +263,7 @@
             <div class="trivia-options-grid" id="options-box"></div>
         </div>
 
-        <!-- SCREEN 4: PI DROP ENGINE -->
-        <div id="screen-drop" class="screen">
-            <div class="game-header"><span style="color: var(--neon-orange);">🪙 Pi Drop</span><span id="drop-score" style="color: var(--neon-pink);">Score: 0</span></div>
-            <canvas id="dropCanvas" width="360" height="380"></canvas>
-            <div style="font-size:0.8rem; color:var(--text-muted)">TAP CANVAS TO THRUST UPWARD</div>
-        </div>
-
-        <!-- SCREEN 5: MEMORY SEQUENCE GRID -->
+        <!-- SCREEN 4: MEMORY SEQUENCE GRID -->
         <div id="screen-memory" class="screen">
             <div class="game-header"><span style="color: var(--neon-yellow);">🧠 Memory Grid</span><span id="memory-score" style="color: var(--neon-pink);">Level: 1</span></div>
             <div class="reflex-grid">
@@ -294,7 +280,7 @@
             <div id="memory-status-text" style="font-size:0.85rem; font-weight:800; color:var(--neon-cyan)">WATCH SEQUENCE...</div>
         </div>
 
-        <!-- SCREEN 6: CYBER DICE 21 -->
+        <!-- SCREEN 5: CYBER DICE 21 -->
         <div id="screen-dice" class="screen">
             <div class="game-header"><span style="color: var(--neon-pink);">🎲 Cyber-Dice 21</span><span id="dice-game-score" style="color: var(--neon-cyan);">Score: 0</span></div>
             <div class="dice-board">
@@ -310,7 +296,7 @@
             </div>
         </div>
 
-        <!-- SCREEN 7: NODE LINKER FLOW -->
+        <!-- SCREEN 6: NODE LINKER FLOW -->
         <div id="screen-linker" class="screen">
             <div class="game-header"><span style="color: var(--neon-green);">🔗 Node Linker</span><span id="linker-timer" style="color: var(--neon-pink);">Time: 30s</span></div>
             <div id="linker-score" style="font-weight:800; font-size:1.2rem; color:#fff; margin-bottom:5px;">Score: 0</div>
@@ -318,7 +304,7 @@
             <div style="font-size:0.8rem; color:var(--text-muted)">TAP TWO ADJACENT MATCHING NODES TO CLEAR</div>
         </div>
 
-        <!-- SCREEN 8: RESULTS -->
+        <!-- SCREEN 7: RESULTS -->
         <div id="screen-results" class="screen">
             <div style="font-size: 1.6rem; font-weight: 900; color: var(--neon-cyan); margin-bottom: 10px;">MATCH CONCLUDED</div>
             <div style="font-size: 2.8rem; font-weight: 900; color: #ffffff; margin: 15px 0 25px 0; text-shadow: 0 0 20px var(--neon-blue);"><span id="display-final-score">0</span> <span style="font-size:1.1rem; color:var(--text-muted)">PTS</span></div>
@@ -441,73 +427,7 @@
             renderTriviaQuestion();
         }
 
-        // --- GAME 4: PI DROP ENGINE (PHYSICS CANVAS) ---
-        let dropCanvas = document.getElementById("dropCanvas");
-        let ctx = dropCanvas.getContext("2d");
-        let playerY, playerVelocity, pipes, dropAnimId, dropScoreValue;
-        let dropGameStarted = false;
-        
-        function launchPiDrop() {
-            switchScreen('screen-drop');
-            gameScore = 0; playerY = 150; playerVelocity = 0; dropScoreValue = 0;
-            pipes = []; dropGameStarted = false;
-            document.getElementById("drop-score").textContent = "Score: 0";
-            
-            dropCanvas.onclick = () => { 
-                if (!dropGameStarted) dropGameStarted = true;
-                playerVelocity = -4.5; 
-            };
-            
-            cancelAnimationFrame(dropAnimId);
-            ctx.clearRect(0, 0, 360, 380);
-            runDropLoop();
-        }
-        function spawnPipe() {
-            let gap = 110;
-            let topHeight = Math.floor(Math.random() * (180 - 40)) + 40;
-            pipes.push({ x: 360, top: topHeight, bottom: topHeight + gap, passed: false });
-        }
-        function runDropLoop() {
-            if (dropGameStarted) {
-                playerVelocity += 0.25; playerY += playerVelocity;
-            }
-            ctx.clearRect(0, 0, 360, 380);
-
-            ctx.shadowBlur = 10; ctx.shadowColor = "#00ffcc";
-            ctx.fillStyle = "#00ffcc"; ctx.beginPath(); ctx.arc(50, playerY, 10, 0, Math.PI * 2); ctx.fill();
-
-            if (playerY > 370 || playerY < 10) { gameScore = dropScoreValue; endGame(); return; }
-
-            if (dropGameStarted) {
-                if (pipes.length === 0 || pipes[pipes.length - 1].x < 200) spawnPipe();
-
-                for (let i = pipes.length - 1; i >= 0; i--) {
-                    pipes[i].x -= 2;
-                    ctx.fillStyle = "rgba(255, 0, 127, 0.7)";
-                    ctx.shadowColor = "#ff007f";
-                    ctx.fillRect(pipes[i].x, 0, 40, pipes[i].top);
-                    ctx.fillRect(pipes[i].x, pipes[i].bottom, 40, 380 - pipes[i].bottom);
-
-                    if (pipes[i].x < 60 && pipes[i].x + 40 > 40) {
-                        if (playerY - 10 < pipes[i].top || playerY + 10 > pipes[i].bottom) {
-                            gameScore = dropScoreValue; endGame(); return;
-                        }
-                    }
-                    if (!pipes[i].passed && pipes[i].x < 50) {
-                        pipes[i].passed = true; dropScoreValue += 20;
-                        document.getElementById("drop-score").textContent = `Score: ${dropScoreValue}`;
-                    }
-                    if (pipes[i].x < -40) pipes.splice(i, 1);
-                }
-            } else {
-                ctx.fillStyle = "#ffffff"; ctx.shadowColor = "transparent";
-                ctx.font = "bold 14px 'Segoe UI'"; ctx.textAlign = "center";
-                ctx.fillText("TAP CANVAS TO INITIALIZE TRANSMISSION", 180, 200);
-            }
-            dropAnimId = requestAnimationFrame(runDropLoop);
-        }
-
-        // --- GAME 5: MEMORY GRID ---
+        // --- GAME 4: MEMORY GRID ---
         let memorySequence = [];
         let playerSequence = [];
         let memoryLevel = 1;
@@ -558,7 +478,7 @@
             }
         }
 
-        // --- GAME 6: CYBER DICE 21 ---
+        // --- GAME 5: CYBER DICE 21 ---
         let playerDiceTotal = 0;
         let dealerDiceTotal = 0;
         let diceRoundsPlayed = 0;
@@ -608,7 +528,7 @@
             setTimeout(resetDiceRound, 1800);
         }
 
-        // --- GAME 7: NODE LINKER FLOW ---
+        // --- GAME 6: NODE LINKER FLOW ---
         const linkerIcons = ["🪙", "🛡️", "⚡", "🧩"];
         let linkerGridArray = [];
         let selectedLinkerIndex = -1;
@@ -661,7 +581,7 @@
 
         // --- GLOBAL HUB CONTROL ---
         function endGame() {
-            clearTimeout(reflexTimer); clearInterval(countdownInterval); cancelAnimationFrame(dropAnimId);
+            clearTimeout(reflexTimer); clearInterval(countdownInterval);
             document.getElementById("display-final-score").textContent = gameScore;
             
             let high = localStorage.getItem("skillclash_highscore") || 0;
