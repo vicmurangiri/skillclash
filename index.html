@@ -445,14 +445,21 @@
         let dropCanvas = document.getElementById("dropCanvas");
         let ctx = dropCanvas.getContext("2d");
         let playerY, playerVelocity, pipes, dropAnimId, dropScoreValue;
+        let dropGameStarted = false;
         
         function launchPiDrop() {
             switchScreen('screen-drop');
             gameScore = 0; playerY = 150; playerVelocity = 0; dropScoreValue = 0;
-            pipes = []; document.getElementById("drop-score").textContent = "Score: 0";
-            dropCanvas.onclick = () => { playerVelocity = -4.5; };
-            spawnPipe();
+            pipes = []; dropGameStarted = false;
+            document.getElementById("drop-score").textContent = "Score: 0";
+            
+            dropCanvas.onclick = () => { 
+                if (!dropGameStarted) dropGameStarted = true;
+                playerVelocity = -4.5; 
+            };
+            
             cancelAnimationFrame(dropAnimId);
+            ctx.clearRect(0, 0, 360, 380);
             runDropLoop();
         }
         function spawnPipe() {
@@ -461,33 +468,42 @@
             pipes.push({ x: 360, top: topHeight, bottom: topHeight + gap, passed: false });
         }
         function runDropLoop() {
-            playerVelocity += 0.25; playerY += playerVelocity;
+            if (dropGameStarted) {
+                playerVelocity += 0.25; playerY += playerVelocity;
+            }
             ctx.clearRect(0, 0, 360, 380);
 
-            ctx.fillStyle = "#00ffcc"; ctx.beginPath(); ctx.arc(50, playerY, 10, 0, Math.PI * 2); ctx.fill();
             ctx.shadowBlur = 10; ctx.shadowColor = "#00ffcc";
+            ctx.fillStyle = "#00ffcc"; ctx.beginPath(); ctx.arc(50, playerY, 10, 0, Math.PI * 2); ctx.fill();
 
             if (playerY > 370 || playerY < 10) { gameScore = dropScoreValue; endGame(); return; }
 
-            for(let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 2;
-                ctx.fillStyle = "rgba(255, 0, 127, 0.7)";
-                ctx.shadowColor = "#ff007f";
-                ctx.fillRect(pipes[i].x, 0, 40, pipes[i].top);
-                ctx.fillRect(pipes[i].x, pipes[i].bottom, 40, 380 - pipes[i].bottom);
+            if (dropGameStarted) {
+                if (pipes.length === 0 || pipes[pipes.length - 1].x < 200) spawnPipe();
 
-                if(pipes[i].x < 60 && pipes[i].x + 40 > 40) {
-                    if(playerY - 10 < pipes[i].top || playerY + 10 > pipes[i].bottom) {
-                        gameScore = dropScoreValue; endGame(); return;
+                for (let i = pipes.length - 1; i >= 0; i--) {
+                    pipes[i].x -= 2;
+                    ctx.fillStyle = "rgba(255, 0, 127, 0.7)";
+                    ctx.shadowColor = "#ff007f";
+                    ctx.fillRect(pipes[i].x, 0, 40, pipes[i].top);
+                    ctx.fillRect(pipes[i].x, pipes[i].bottom, 40, 380 - pipes[i].bottom);
+
+                    if (pipes[i].x < 60 && pipes[i].x + 40 > 40) {
+                        if (playerY - 10 < pipes[i].top || playerY + 10 > pipes[i].bottom) {
+                            gameScore = dropScoreValue; endGame(); return;
+                        }
                     }
+                    if (!pipes[i].passed && pipes[i].x < 50) {
+                        pipes[i].passed = true; dropScoreValue += 20;
+                        document.getElementById("drop-score").textContent = `Score: ${dropScoreValue}`;
+                    }
+                    if (pipes[i].x < -40) pipes.splice(i, 1);
                 }
-                if(!pipes[i].passed && pipes[i].x < 50) {
-                    pipes[i].passed = true; dropScoreValue += 20;
-                    document.getElementById("drop-score").textContent = `Score: ${dropScoreValue}`;
-                }
-                if(pipes[i].x < -40) pipes.splice(i, 1);
+            } else {
+                ctx.fillStyle = "#ffffff"; ctx.shadowColor = "transparent";
+                ctx.font = "bold 14px 'Segoe UI'"; ctx.textAlign = "center";
+                ctx.fillText("TAP CANVAS TO INITIALIZE TRANSMISSION", 180, 200);
             }
-            if(pipes.length === 0 || pipes[pipes.length - 1].x < 200) spawnPipe();
             dropAnimId = requestAnimationFrame(runDropLoop);
         }
 
@@ -628,7 +644,6 @@
 
                 if(prevIdx === idx) return;
 
-                // Matrix adjacency verification rules
                 let r1 = Math.floor(prevIdx / 4), c1 = prevIdx % 4;
                 let r2 = Math.floor(idx / 4), c2 = idx % 4;
                 let isAdjacent = (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
@@ -636,7 +651,6 @@
                 if(isAdjacent && linkerGridArray[prevIdx] === linkerGridArray[idx]) {
                     gameScore += 40;
                     document.getElementById("linker-score").textContent = `Score: ${gameScore}`;
-                    // Flash replace items
                     linkerGridArray[prevIdx] = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
                     linkerGridArray[idx] = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
                     document.getElementById(`lnode-${prevIdx}`).textContent = linkerGridArray[prevIdx];
@@ -654,7 +668,6 @@
             if(gameScore > parseInt(high)) {
                 localStorage.setItem("skillclash_highscore", gameScore);
             }
-            
             switchScreen('screen-results');
         }
         function returnToLobby() {
