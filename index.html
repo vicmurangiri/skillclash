@@ -114,8 +114,7 @@
         .player-info h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
         .player-info div { font-size: 1.1rem; font-weight: 700; color: #ffffff; }
 
-        /* --- MODE ARCADE HUB GRID --- */
-        .mode-grid { display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+        .mode-grid { display: flex; flex-direction: column; gap: 12px; max-height: 48vh; overflow-y: auto; padding-right: 4px; }
         .mode-grid::-webkit-scrollbar { width: 4px; }
         .mode-grid::-webkit-scrollbar-thumb { background: rgba(62, 72, 117, 0.4); border-radius: 10px; }
 
@@ -150,11 +149,11 @@
             background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
             color: #05060a; border: none; border-radius: 12px;
             font-weight: 800; font-size: 0.95rem; text-transform: uppercase; cursor: pointer;
+            margin-top: 10px;
         }
 
-        /* --- INTERFACE CONTAINERS --- */
         .reflex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .reflex-node { aspect-ratio: 1; background: rgba(14, 17, 33, 0.7); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 14px; cursor: pointer; transition: all 0.1s; }
+        .reflex-node { aspect-ratio: 1; background: rgba(14, 17, 33, 0.7); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: all 0.1s; }
         .reflex-node.active { background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); box-shadow: 0 0 20px var(--neon-pink); border-color: #ffffff; }
         .reflex-node.mem-active { background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange)); box-shadow: 0 0 20px var(--neon-orange); border-color: #ffffff; }
 
@@ -167,8 +166,18 @@
         .option-btn { width: 100%; padding: 12px 15px; background: rgba(20, 24, 43, 0.6); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 10px; color: #fff; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
         .option-btn:hover { background: rgba(0, 255, 204, 0.08); border-color: var(--neon-cyan); color: var(--neon-cyan); }
 
-        /* Canvas Game Container */
         canvas { background: #090c15; border: 2px solid rgba(255, 123, 0, 0.3); border-radius: 16px; display: block; margin: 15px auto; max-width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+        /* Cyber Dice Styling */
+        .dice-board { background: rgba(20, 24, 43, 0.6); border-radius: 16px; padding: 20px; border: 1px solid rgba(255, 0, 127, 0.2); margin: 15px 0; }
+        .dice-score-flex { display: flex; justify-content: space-around; margin-bottom: 15px; }
+        .dice-score-box h4 { margin: 0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+        .dice-score-box div { font-size: 1.8rem; font-weight: 800; color: #fff; }
+
+        /* Linker Grid Styling */
+        .linker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 20px 0; }
+        .linker-node { aspect-ratio: 1; background: rgba(9, 12, 21, 0.8); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 10px; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.1s; }
+        .linker-node.selected { background: rgba(57, 255, 20, 0.15); border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.2); }
     </style>
 </head>
 <body>
@@ -194,8 +203,8 @@
         <!-- SCREEN 0: LOBBY -->
         <div id="screen-lobby" class="screen active-screen">
             <div class="player-card">
-                <div class="player-info"><h3>Authenticated Pioneer</h3><div id="player-username">Connecting...</div></div>
-                <div style="font-size: 1.4rem;">🛡️</div>
+                <div class="player-info"><h3>Pioneer Network Profile</h3><div id="player-username">Connecting...</div></div>
+                <div style="font-size: 0.85rem; text-align: right;"><span style="color:var(--text-muted)">HIGH SCORE</span><br><b id="lobby-high-score" style="color:var(--neon-cyan)">0</b></div>
             </div>
             
             <div class="mode-grid">
@@ -265,7 +274,7 @@
         <div id="screen-drop" class="screen">
             <div class="game-header"><span style="color: var(--neon-orange);">🪙 Pi Drop</span><span id="drop-score" style="color: var(--neon-pink);">Score: 0</span></div>
             <canvas id="dropCanvas" width="360" height="380"></canvas>
-            <div style="font-size:0.8rem; color:var(--text-muted);">TAP THE CANVAS TO THRUST UPWARD</div>
+            <div style="font-size:0.8rem; color:var(--text-muted)">TAP CANVAS TO THRUST UPWARD</div>
         </div>
 
         <!-- SCREEN 5: MEMORY SEQUENCE GRID -->
@@ -285,7 +294,31 @@
             <div id="memory-status-text" style="font-size:0.85rem; font-weight:800; color:var(--neon-cyan)">WATCH SEQUENCE...</div>
         </div>
 
-        <!-- SCREEN 6: RESULTS -->
+        <!-- SCREEN 6: CYBER DICE 21 -->
+        <div id="screen-dice" class="screen">
+            <div class="game-header"><span style="color: var(--neon-pink);">🎲 Cyber-Dice 21</span><span id="dice-game-score" style="color: var(--neon-cyan);">Score: 0</span></div>
+            <div class="dice-board">
+                <div class="dice-score-flex">
+                    <div class="dice-score-box"><h4>Your Compilation</h4><div id="dice-player-total">0</div></div>
+                    <div class="dice-score-box"><h4>Host Dealer AI</h4><div id="dice-dealer-total">?</div></div>
+                </div>
+                <div id="dice-status-msg" style="color:var(--neon-blue); font-size:0.9rem; font-weight:700;">CHOOSE ACTION MATRIX</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-action" style="background:var(--neon-blue);" onclick="diceHit()">Load Data (Hit)</button>
+                <button class="btn-action" style="background:var(--neon-pink);" onclick="diceStand()">Execute (Stand)</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: NODE LINKER FLOW -->
+        <div id="screen-linker" class="screen">
+            <div class="game-header"><span style="color: var(--neon-green);">🔗 Node Linker</span><span id="linker-timer" style="color: var(--neon-pink);">Time: 30s</span></div>
+            <div id="linker-score" style="font-weight:800; font-size:1.2rem; color:#fff; margin-bottom:5px;">Score: 0</div>
+            <div class="linker-grid" id="linker-container"></div>
+            <div style="font-size:0.8rem; color:var(--text-muted)">TAP TWO ADJACENT MATCHING NODES TO CLEAR</div>
+        </div>
+
+        <!-- SCREEN 8: RESULTS -->
         <div id="screen-results" class="screen">
             <div style="font-size: 1.6rem; font-weight: 900; color: var(--neon-cyan); margin-bottom: 10px;">MATCH CONCLUDED</div>
             <div style="font-size: 2.8rem; font-weight: 900; color: #ffffff; margin: 15px 0 25px 0; text-shadow: 0 0 20px var(--neon-blue);"><span id="display-final-score">0</span> <span style="font-size:1.1rem; color:var(--text-muted)">PTS</span></div>
@@ -308,13 +341,14 @@
         const wordRepository = ["BLOCKCHAIN", "CRYPTO", "PIONEER", "NETWORK", "SECURITY", "MATRIX", "MINING", "VALIDATOR"];
         const triviaRepository = [
             { q: "What is the primary mechanism used to secure a blockchain data ledger?", o: ["Proof of Work / Stake", "Central Firewalls", "SQL Encryption Tables", "Cloud Backup Sync"], a: 0 },
-            { q: "Which component executes non-fungible automated logical contracts inside ecosystems?", o: ["Hardware Wallets", "Smart Contracts Engine", "File Allocation Tables", "Peer Domain Routers"], a: 1 },
-            { q: "What process verifies data validity transactions across fully decentralized networks?", o: ["Asynchronous Compiling", "Distributed Consensus", "Localized Kernel Auditing", "Macro Thread Queues"], a: 2 }
+            { q: "Which component executes automated logical contracts inside decentralized ecosystems?", o: ["Hardware Wallets", "Smart Contracts Engine", "File Allocation Tables", "Peer Domain Routers"], a: 1 },
+            { q: "What process verifies data validity transactions across fully distributed networks?", o: ["Asynchronous Compiling", "Distributed Consensus", "Localized Kernel Auditing", "Macro Thread Queues"], a: 2 }
         ];
 
         document.addEventListener("DOMContentLoaded", () => { initializePiHub(); });
 
         async function initializePiHub() {
+            updateLobbyHighScoreDisplay();
             try {
                 await Pi.init({ version: "2.0", sandbox: true });
                 const auth = await Pi.authenticate(["username"], function(p){});
@@ -340,6 +374,11 @@
                 document.getElementById(labelId).textContent = `Time: ${timeLeft}s`;
                 if(timeLeft <= 0) endGame();
             }, 1000);
+        }
+
+        function updateLobbyHighScoreDisplay() {
+            let currentHighScore = localStorage.getItem("skillclash_highscore") || 0;
+            document.getElementById("lobby-high-score").textContent = currentHighScore;
         }
 
         // --- GAME 1: REFLEX ---
@@ -425,22 +464,18 @@
             playerVelocity += 0.25; playerY += playerVelocity;
             ctx.clearRect(0, 0, 360, 380);
 
-            // Draw player node
             ctx.fillStyle = "#00ffcc"; ctx.beginPath(); ctx.arc(50, playerY, 10, 0, Math.PI * 2); ctx.fill();
             ctx.shadowBlur = 10; ctx.shadowColor = "#00ffcc";
 
-            // Collision check with floors
             if (playerY > 370 || playerY < 10) { gameScore = dropScoreValue; endGame(); return; }
 
-            // Pipes handling
             for(let i = pipes.length - 1; i >= 0; i--) {
                 pipes[i].x -= 2;
                 ctx.fillStyle = "rgba(255, 0, 127, 0.7)";
                 ctx.shadowColor = "#ff007f";
-                ctx.fillRect(pipes[i].x, 0, 40, pipes[i].top); // Top bar
-                ctx.fillRect(pipes[i].x, pipes[i].bottom, 40, 380 - pipes[i].bottom); // Bottom bar
+                ctx.fillRect(pipes[i].x, 0, 40, pipes[i].top);
+                ctx.fillRect(pipes[i].x, pipes[i].bottom, 40, 380 - pipes[i].bottom);
 
-                // Collision Detection
                 if(pipes[i].x < 60 && pipes[i].x + 40 > 40) {
                     if(playerY - 10 < pipes[i].top || playerY + 10 > pipes[i].bottom) {
                         gameScore = dropScoreValue; endGame(); return;
@@ -456,7 +491,7 @@
             dropAnimId = requestAnimationFrame(runDropLoop);
         }
 
-        // --- GAME 5: MEMORY GRID LAYER ---
+        // --- GAME 5: MEMORY GRID ---
         let memorySequence = [];
         let playerSequence = [];
         let memoryLevel = 1;
@@ -507,17 +542,125 @@
             }
         }
 
-        // Placeholders for Phase 2
-        function launchDice() { alert("Cyber-Dice 21 engine rolling down in Phase 2 update!"); }
-        function launchLinker() { alert("Node Linker Grid loading in Phase 2 update!"); }
+        // --- GAME 6: CYBER DICE 21 ---
+        let playerDiceTotal = 0;
+        let dealerDiceTotal = 0;
+        let diceRoundsPlayed = 0;
+
+        function launchDice() {
+            switchScreen('screen-dice');
+            gameScore = 0; playerDiceTotal = 0; dealerDiceTotal = 0; diceRoundsPlayed = 0;
+            document.getElementById("dice-game-score").textContent = "Score: 0";
+            resetDiceRound();
+        }
+        function resetDiceRound() {
+            if(diceRoundsPlayed >= 5) { endGame(); return; }
+            playerDiceTotal = Math.floor(Math.random() * 10) + 2;
+            dealerDiceTotal = Math.floor(Math.random() * 8) + 8;
+            document.getElementById("dice-player-total").textContent = playerDiceTotal;
+            document.getElementById("dice-dealer-total").textContent = "?";
+            document.getElementById("dice-status-msg").textContent = "LOAD DATA OR STAND";
+            document.getElementById("dice-status-msg").style.color = "var(--neon-blue)";
+        }
+        function diceHit() {
+            let card = Math.floor(Math.random() * 11) + 1;
+            playerDiceTotal += card;
+            document.getElementById("dice-player-total").textContent = playerDiceTotal;
+            if(playerDiceTotal > 21) {
+                document.getElementById("dice-status-msg").textContent = "OVERLOAD! COMPILATION BUST.";
+                document.getElementById("dice-status-msg").style.color = "var(--neon-pink)";
+                diceRoundsPlayed++;
+                setTimeout(resetDiceRound, 1500);
+            }
+        }
+        function diceStand() {
+            document.getElementById("dice-dealer-total").textContent = dealerDiceTotal;
+            if(playerDiceTotal === 21) {
+                gameScore += 100;
+                document.getElementById("dice-status-msg").textContent = "PERFECT 21 MATRIX MULTIPLIER!";
+                document.getElementById("dice-status-msg").style.color = "var(--neon-green)";
+            } else if(dealerDiceTotal > 21 || playerDiceTotal > dealerDiceTotal) {
+                gameScore += 50;
+                document.getElementById("dice-status-msg").textContent = "HOST ENGINES OVERRULED. WIN!";
+                document.getElementById("dice-status-msg").style.color = "var(--neon-cyan)";
+            } else {
+                document.getElementById("dice-status-msg").textContent = "HOST INTELLIGENCE OUTSCORED YOU.";
+                document.getElementById("dice-status-msg").style.color = "var(--neon-orange)";
+            }
+            document.getElementById("dice-game-score").textContent = `Score: ${gameScore}`;
+            diceRoundsPlayed++;
+            setTimeout(resetDiceRound, 1800);
+        }
+
+        // --- GAME 7: NODE LINKER FLOW ---
+        const linkerIcons = ["🪙", "🛡️", "⚡", "🧩"];
+        let linkerGridArray = [];
+        let selectedLinkerIndex = -1;
+
+        function launchLinker() {
+            switchScreen('screen-linker');
+            gameScore = 0; selectedLinkerIndex = -1;
+            document.getElementById("linker-score").textContent = "Score: 0";
+            buildLinkerGrid(); runGlobalTimer("linker-timer");
+        }
+        function buildLinkerGrid() {
+            const container = document.getElementById("linker-container");
+            container.innerHTML = "";
+            linkerGridArray = [];
+            for(let i=0; i<16; i++) {
+                let randomIcon = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
+                linkerGridArray.push(randomIcon);
+                let cell = document.createElement("div");
+                cell.className = "linker-node"; cell.id = `lnode-${i}`;
+                cell.textContent = randomIcon;
+                cell.onclick = () => tapLinkerNode(i);
+                container.appendChild(cell);
+            }
+        }
+        function tapLinkerNode(idx) {
+            if(selectedLinkerIndex === -1) {
+                selectedLinkerIndex = idx;
+                document.getElementById(`lnode-${idx}`).classList.add('selected');
+            } else {
+                let prevIdx = selectedLinkerIndex;
+                document.getElementById(`lnode-${prevIdx}`).classList.remove('selected');
+                selectedLinkerIndex = -1;
+
+                if(prevIdx === idx) return;
+
+                // Matrix adjacency verification rules
+                let r1 = Math.floor(prevIdx / 4), c1 = prevIdx % 4;
+                let r2 = Math.floor(idx / 4), c2 = idx % 4;
+                let isAdjacent = (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
+
+                if(isAdjacent && linkerGridArray[prevIdx] === linkerGridArray[idx]) {
+                    gameScore += 40;
+                    document.getElementById("linker-score").textContent = `Score: ${gameScore}`;
+                    // Flash replace items
+                    linkerGridArray[prevIdx] = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
+                    linkerGridArray[idx] = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
+                    document.getElementById(`lnode-${prevIdx}`).textContent = linkerGridArray[prevIdx];
+                    document.getElementById(`lnode-${idx}`).textContent = linkerGridArray[idx];
+                }
+            }
+        }
 
         // --- GLOBAL HUB CONTROL ---
         function endGame() {
             clearTimeout(reflexTimer); clearInterval(countdownInterval); cancelAnimationFrame(dropAnimId);
             document.getElementById("display-final-score").textContent = gameScore;
+            
+            let high = localStorage.getItem("skillclash_highscore") || 0;
+            if(gameScore > parseInt(high)) {
+                localStorage.setItem("skillclash_highscore", gameScore);
+            }
+            
             switchScreen('screen-results');
         }
-        function returnToLobby() { switchScreen('screen-lobby'); }
+        function returnToLobby() {
+            updateLobbyHighScoreDisplay();
+            switchScreen('screen-lobby');
+        }
     </script>
 </body>
 </html>
