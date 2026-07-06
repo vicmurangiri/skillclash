@@ -3,32 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillClash AI Premium Hub</title>
+    <title>SkillClash AI Arcade Hub</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
         :root {
-            --bg-dark: #05060f;
-            --panel-bg: rgba(13, 17, 33, 0.85);
-            --neon-cyan: #00ffcc;
-            --neon-blue: #00bfff;
-            --neon-purple: #9d4edd;
-            --neon-pink: #ff007f;
-            --neon-orange: #ff7b00;
-            --neon-yellow: #ffea00;
-            --neon-green: #39ff14;
-            --text-main: #f0f3ff;
-            --text-muted: #6e789e;
+            --bg-deep: #0b0914;
+            --arcade-surface: #151226;
+            --arcade-surface-hover: #1e1a36;
+            --neon-glow: 0 0 15px rgba(0, 255, 204, 0.4);
+            
+            /* High Saturation Game Palettes inspired by CiDi Games */
+            --grad-trivia: linear-gradient(135deg, #00f0ff 0%, #004bff 100%);
+            --grad-scramble: linear-gradient(135deg, #9d4edd 0%, #5a189a 100%);
+            --grad-reflex: linear-gradient(135deg, #ff007f 0%, #70003c 100%);
+            --grad-memory: linear-gradient(135deg, #ffea00 0%, #ff7b00 100%);
+            --grad-dice: linear-gradient(135deg, #ff2a6d 0%, #9100ff 100%);
+            --grad-linker: linear-gradient(135deg, #39ff14 0%, #007200 100%);
+            
+            --text-bright: #ffffff;
+            --text-dim: #9fa6c4;
         }
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-dark);
+            background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 191, 255, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(157, 78, 221, 0.06) 0%, transparent 40%);
-            color: var(--text-main);
+                radial-gradient(circle at 50% 0%, rgba(157, 78, 221, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 40%);
+            color: var(--text-bright);
             margin: 0;
-            padding: 15px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -37,204 +41,305 @@
         }
 
         .container {
-            max-width: 500px;
+            max-width: 480px;
             width: 100%;
-            background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 28px;
-            padding: 25px 15px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 204, 0.03);
+            background: rgba(21, 18, 38, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 20px 14px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.1);
             text-align: center;
-            border: 1px solid rgba(43, 50, 82, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             box-sizing: border-box;
+        }
+
+        /* High-Impact Top Banner */
+        .header-banner {
+            background: linear-gradient(145deg, #241b45, #110a24);
+            border-radius: 24px;
+            padding: 20px 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.4);
             position: relative;
+            overflow: hidden;
         }
 
-        .logo-container {
-            margin-bottom: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .header-banner::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, transparent 60%);
+            animation: bannerPulse 6s infinite alternate;
         }
 
-        .brand-logo-svg {
-            width: 65px;
-            height: 65px;
-            filter: drop-shadow(0 0 10px var(--neon-cyan));
-            animation: pulseGlow 3s infinite alternate;
-        }
+        @keyframes bannerPulse { 0% { transform: translate(-5%, -5%); } 100% { transform: translate(5%, 5%); } }
 
         .brand-title {
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #ffffff 30%, var(--neon-cyan) 100%);
+            letter-spacing: 2px;
+            background: linear-gradient(180deg, #ffffff 40%, #00f0ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 5px 0 2px 0;
-        }
-
-        @keyframes pulseGlow {
-            0% { filter: drop-shadow(0 0 6px var(--neon-cyan)); transform: scale(1); }
-            100% { filter: drop-shadow(0 0 14px var(--neon-blue)); transform: scale(1.02); }
+            margin: 0;
+            filter: drop-shadow(0 2px 8px rgba(0, 240, 255, 0.3));
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(7, 9, 19, 0.8);
-            color: var(--neon-cyan);
-            padding: 5px 12px;
+            background: #0b0914;
+            color: #39ff14;
+            padding: 6px 14px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(0, 255, 204, 0.2);
+            letter-spacing: 1.5px;
+            margin-top: 10px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+        .status-dot { width: 8px; height: 8px; background-color: #39ff14; border-radius: 50%; box-shadow: 0 0 8px #39ff14; }
+
+        /* Row Mode Cards inspired by CiDi Games Row-Layout List style */
+        .section-label {
+            text-align: left;
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 15px 0 12px 6px;
+            letter-spacing: 0.5px;
+            color: var(--text-bright);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .status-dot { width: 6px; height: 6px; background-color: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 6px var(--neon-cyan); }
+        .mode-list { display: flex; flex-direction: column; gap: 14px; }
 
-        .player-card {
-            background: linear-gradient(135deg, rgba(20, 24, 43, 0.9), rgba(11, 14, 26, 0.9));
-            border-left: 4px solid var(--neon-blue);
-            border-radius: 14px;
-            padding: 12px 18px;
-            margin-bottom: 20px;
+        .game-row-card {
+            background: var(--arcade-surface);
+            border-radius: 20px;
+            padding: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            text-align: left;
-        }
-
-        .player-info h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
-        .player-info div { font-size: 1.1rem; font-weight: 700; color: #ffffff; }
-
-        .mode-grid { display: flex; flex-direction: column; gap: 12px; max-height: 48vh; overflow-y: auto; padding-right: 4px; }
-        .mode-grid::-webkit-scrollbar { width: 4px; }
-        .mode-grid::-webkit-scrollbar-thumb { background: rgba(62, 72, 117, 0.4); border-radius: 10px; }
-
-        .mode-card {
-            background: rgba(20, 24, 43, 0.5);
-            border: 1px solid rgba(62, 72, 117, 0.35);
-            border-radius: 14px;
-            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
         }
-        .mode-card:hover { background: rgba(29, 35, 64, 0.7); transform: translateX(3px); }
-        .mode-card.m-trivia:hover { border-color: var(--neon-cyan); }
-        .mode-card.m-puzzle:hover { border-color: var(--neon-blue); }
-        .mode-card.m-reflex:hover { border-color: var(--neon-purple); }
-        .mode-card.m-memory:hover { border-color: var(--neon-yellow); }
-        .mode-card.m-dice:hover { border-color: var(--neon-pink); }
-        .mode-card.m-linker:hover { border-color: var(--neon-green); }
 
-        .mode-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 3px; }
-        .mode-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; }
+        .game-row-card:hover {
+            background: var(--arcade-surface-hover);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+        }
 
+        .game-meta-box { display: flex; align-items: center; gap: 14px; text-align: left; }
+
+        /* Custom Created Dynamic Visual Icons */
+        .game-icon-badge {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-icon-badge::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.15); border-radius: 0 0 50% 50%;
+        }
+
+        .badge-trivia { background: var(--grad-trivia); }
+        .badge-scramble { background: var(--grad-scramble); }
+        .badge-reflex { background: var(--grad-reflex); }
+        .badge-memory { background: var(--grad-memory); }
+        .badge-dice { background: var(--grad-dice); }
+        .badge-linker { background: var(--grad-linker); }
+
+        .game-icon-badge svg { width: 30px; height: 30px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+        .game-details h3 { margin: 0 0 2px 0; font-size: 1.05rem; font-weight: 800; color: #fff; }
+        .game-details p { margin: 0; font-size: 0.78rem; color: var(--text-dim); line-height: 1.2; max-width: 220px; }
+        .game-live-counter { font-size: 0.7rem; color: #00f0ff; font-weight: 700; margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+
+        /* Dynamic Launch Action button identical to CiDi's design language */
+        .play-action-btn {
+            background: linear-gradient(180deg, #39ff14 0%, #00aa00 100%);
+            color: #000;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+            transition: transform 0.1s;
+            text-transform: uppercase;
+        }
+        .game-row-card:hover .play-action-btn { transform: scale(1.05); box-shadow: 0 6px 16px rgba(57, 255, 20, 0.5); }
+
+        /* Screens and Overlays */
         .screen { display: none; }
         .active-screen { display: block; }
 
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 800; text-transform: uppercase; font-size: 0.95rem;}
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 800; text-transform: uppercase; font-size: 1rem; background: rgba(0,0,0,0.2); padding: 10px 15px; border-radius: 14px;}
 
         .btn-action {
             width: 100%; padding: 14px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-            color: #05060a; border: none; border-radius: 12px;
-            font-weight: 800; font-size: 0.95rem; text-transform: uppercase; cursor: pointer;
-            margin-top: 10px;
+            background: linear-gradient(180deg, #00f0ff 0%, #0072ff 100%);
+            color: #fff; border: none; border-radius: 16px;
+            font-weight: 800; font-size: 1rem; text-transform: uppercase; cursor: pointer;
+            margin-top: 10px; box-shadow: 0 6px 20px rgba(0, 240, 255, 0.3);
         }
 
-        .reflex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .reflex-node { aspect-ratio: 1; background: rgba(14, 17, 33, 0.7); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: all 0.1s; }
-        .reflex-node.active { background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); box-shadow: 0 0 20px var(--neon-pink); border-color: #ffffff; }
-        .reflex-node.mem-active { background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange)); box-shadow: 0 0 20px var(--neon-orange); border-color: #ffffff; }
+        /* Matrix Arenas adjustments */
+        .reflex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+        .reflex-node { aspect-ratio: 1; background: #1a1633; border: 2px solid rgba(255,255,255,0.05); border-radius: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: all 0.1s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .reflex-node.active { background: var(--grad-reflex); box-shadow: 0 0 25px #ff007f; border-color: #ffffff; }
+        .reflex-node.mem-active { background: var(--grad-memory); box-shadow: 0 0 25px #ff7b00; border-color: #ffffff; }
 
-        .scramble-box { font-size: 2.2rem; font-weight: 900; letter-spacing: 5px; color: var(--neon-blue); text-shadow: 0 0 12px rgba(0, 191, 255, 0.4); margin: 15px 0; text-transform: uppercase; }
-        .matrix-input { width: 100%; padding: 14px; background: #090c15; border: 2px solid #1c223a; border-radius: 12px; color: #fff; font-size: 1.1rem; text-align: center; outline: none; box-sizing: border-box; text-transform: uppercase; margin-bottom: 15px; }
-        .matrix-input:focus { border-color: var(--neon-blue); }
+        .scramble-box { font-size: 2.4rem; font-weight: 900; letter-spacing: 4px; color: #00f0ff; text-shadow: 0 0 15px rgba(0, 240, 255, 0.6); margin: 25px 0; text-transform: uppercase; }
+        .matrix-input { width: 100%; padding: 16px; background: #0b0914; border: 2px solid #2e2654; border-radius: 16px; color: #fff; font-size: 1.2rem; text-align: center; outline: none; box-sizing: border-box; text-transform: uppercase; margin-bottom: 15px; }
+        .matrix-input:focus { border-color: #00f0ff; box-shadow: 0 0 10px rgba(0,240,255,0.2); }
 
-        .trivia-question { font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 15px 0; line-height: 1.4; text-align: left; }
-        .trivia-options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .option-btn { width: 100%; padding: 12px 15px; background: rgba(20, 24, 43, 0.6); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 10px; color: #fff; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
-        .option-btn:hover { background: rgba(0, 255, 204, 0.08); border-color: var(--neon-cyan); color: var(--neon-cyan); }
+        .trivia-question { font-size: 1.2rem; font-weight: 700; color: #ffffff; margin: 20px 0; line-height: 1.4; text-align: left; }
+        .trivia-options-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; }
+        .option-btn { width: 100%; padding: 14px 18px; background: #1c1836; border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; color: #fff; text-align: left; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .option-btn:hover { background: rgba(0, 240, 255, 0.1); border-color: #00f0ff; color: #00f0ff; }
 
-        /* Cyber Dice Styling */
-        .dice-board { background: rgba(20, 24, 43, 0.6); border-radius: 16px; padding: 20px; border: 1px solid rgba(255, 0, 127, 0.2); margin: 15px 0; }
+        .dice-board { background: #1c1836; border-radius: 20px; padding: 20px; border: 1px solid rgba(255, 42, 109, 0.2); margin: 20px 0; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
         .dice-score-flex { display: flex; justify-content: space-around; margin-bottom: 15px; }
-        .dice-score-box h4 { margin: 0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-        .dice-score-box div { font-size: 1.8rem; font-weight: 800; color: #fff; }
+        .dice-score-box h4 { margin: 0; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
+        .dice-score-box div { font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
 
-        /* Linker Grid Styling */
-        .linker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 20px 0; }
-        .linker-node { aspect-ratio: 1; background: rgba(9, 12, 21, 0.8); border: 1px solid rgba(62, 72, 117, 0.4); border-radius: 10px; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.1s; }
-        .linker-node.selected { background: rgba(57, 255, 20, 0.15); border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.2); }
+        .linker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .linker-node { aspect-ratio: 1; background: #0b0914; border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .linker-node.selected { background: rgba(57, 255, 20, 0.15); border-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="logo-container">
-            <svg class="brand-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 5L85 25V65L50 95L15 65V25L50 5Z" stroke="#00ffcc" stroke-width="3" fill="rgba(0, 255, 204, 0.03)"/>
-                <path d="M50 20L73 35V57L50 78L27 57V35L50 20Z" fill="url(#logo-grad)" opacity="0.8"/>
-                <circle cx="50" cy="48" r="8" fill="#ffffff" filter="drop-shadow(0 0 5px #fff)"/>
-                <defs>
-                    <linearGradient id="logo-grad" x1="50" y1="20" x2="50" y2="78" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#00ffcc"/>
-                        <stop offset="1" stop-color="#00bfff"/>
-                    </linearGradient>
-                </defs>
-            </svg>
-            <div class="brand-title">SkillClash AI</div>
+        <!-- TOP ARCADE HERO BANNER -->
+        <div class="header-banner">
+            <h1 class="brand-title">SkillClash AI</h1>
+            <div id="auth-status" class="status-badge"><div class="status-dot"></div><span>SYNCING MATRIX</span></div>
         </div>
 
-        <div id="auth-status" class="status-badge"><div class="status-dot"></div><span>Synchronizing Matrix</span></div>
-
-        <!-- SCREEN 0: LOBBY -->
+        <!-- SCREEN 0: ARCADE LOBBY -->
         <div id="screen-lobby" class="screen active-screen">
-            <div class="player-card">
-                <div class="player-info"><h3>Pioneer Network Profile</h3><div id="player-username">Connecting...</div></div>
-                <div style="font-size: 0.85rem; text-align: right;"><span style="color:var(--text-muted)">HIGH SCORE</span><br><b id="lobby-high-score" style="color:var(--neon-cyan)">0</b></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin: 0 6px 15px 6px;">
+                <div style="text-align:left;"><span style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase;">Player Node</span><br><b id="player-username" style="color:#fff; font-size:1.1rem;">Connecting...</b></div>
+                <div style="text-align:right;"><span style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase;">Personal Best</span><br><b id="lobby-high-score" style="color:#00f0ff; font-size:1.2rem; text-shadow:0 0 10px rgba(0,240,255,0.4);">0</b></div>
             </div>
+
+            <div class="section-label">⚡ Live Arcade Tracks</div>
             
-            <div class="mode-grid">
-                <div class="mode-card m-trivia" onclick="launchTrivia()">
-                    <div class="mode-title" style="color: var(--neon-cyan);">🤖 AI Trivia Arena</div>
-                    <div class="mode-desc">High-speed cognitive battles. Chain together instant correct inputs to activate multi-streak point boosts.</div>
+            <div class="mode-list">
+                <!-- GAME 1 -->
+                <div class="game-row-card" onclick="launchTrivia()">
+                    <div class="game-meta-box">
+                        <div class="game-icon-badge badge-trivia">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <div class="game-details">
+                            <h3>AI Trivia Arena</h3>
+                            <p>High-speed cognitive database battles.</p>
+                            <div class="game-live-counter">🟢 41.2K playing</div>
+                        </div>
+                    </div>
+                    <button class="play-action-btn">Play</button>
                 </div>
-                <div class="mode-card m-puzzle" onclick="launchPuzzle()">
-                    <div class="mode-title" style="color: var(--neon-blue);">🧩 Word Scramble Matrix</div>
-                    <div class="mode-desc">Deconstruct scrambled algorithmic string matrices back into fully verified vocab keys against a depleting timer.</div>
+
+                <!-- GAME 2 -->
+                <div class="game-row-card" onclick="launchPuzzle()">
+                    <div class="game-meta-box">
+                        <div class="game-icon-badge badge-scramble">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 3v18M3 12h18M3 3l18 18M21 3L3 21"/></svg>
+                        </div>
+                        <div class="game-details">
+                            <h3>Word Matrix</h3>
+                            <p>Deconstruct scrambled logic strings.</p>
+                            <div class="game-live-counter">🟢 28.7K playing</div>
+                        </div>
+                    </div>
+                    <button class="play-action-btn">Play</button>
                 </div>
-                <div class="mode-card m-reflex" onclick="launchReflex()">
-                    <div class="mode-title" style="color: var(--neon-purple);">⚡ Reflex Node Tap</div>
-                    <div class="mode-desc">Pure kinetic speed optimization. Terminate localized visual neural targets instantly upon ignition.</div>
+
+                <!-- GAME 3 -->
+                <div class="game-row-card" onclick="launchReflex()">
+                    <div class="game-meta-box">
+                        <div class="game-icon-badge badge-reflex">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </div>
+                        <div class="game-details">
+                            <h3>Reflex Node Tap</h3>
+                            <p>Terminate localized neural targets instantly.</p>
+                            <div class="game-live-counter">🟢 35.1K playing</div>
+                        </div>
+                    </div>
+                    <button class="play-action-btn">Play</button>
                 </div>
-                <div class="mode-card m-memory" onclick="launchMemory()">
-                    <div class="mode-title" style="color: var(--neon-yellow);">🧠 Memory Node Grid</div>
-                    <div class="mode-desc">High-velocity pattern recall. Repeat the pulsing algorithmic flashing nodes sequence perfectly.</div>
+
+                <!-- GAME 4 -->
+                <div class="game-row-card" onclick="launchMemory()">
+                    <div class="game-meta-box">
+                        <div class="game-icon-badge badge-memory">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <div class="game-details">
+                            <h3>Memory Grid</h3>
+                            <p>High-velocity sequence pattern recall.</p>
+                            <div class="game-live-counter">🟢 19.4K playing</div>
+                        </div>
+                    </div>
+                    <button class="play-action-btn">Play</button>
                 </div>
-                <div class="mode-card m-dice" onclick="launchDice()">
-                    <div class="mode-title" style="color: var(--neon-pink);">🎲 Cyber-Dice 21</div>
-                    <div class="mode-desc">Calculate risks. Compile data blocks to get close to 21 without overloading against the host neural dealer.</div>
+
+                <!-- GAME 5 -->
+                <div class="game-row-card" onclick="launchDice()">
+                    <div class="game-meta-box">
+                        <div class="game-icon-badge badge-dice">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="8.5" cy="15.5" r="1.5"/></svg>
+                        </div>
+                        <div class="game-details">
+                            <h3>Cyber-Dice 21</h3>
+                            <p>Compile vectors to reach 21 without crash.</p>
+                            <div class="game-live-counter">🟢 24.8K playing</div>
+                        </div>
+                    </div>
+                    <button class="play-action-btn">Play</button>
                 </div>
-                <div class="mode-card m-linker" onclick="launchLinker()">
-                    <div class="mode-title" style="color: var(--neon-green);">🔗 Node Linker Flow</div>
-                    <div class="mode-desc">Swipe and incinerate matching block matrix nodes before the data cache leaks to the ceiling.</div>
+
+                <!-- GAME 6 -->
+                <div class="game-row-card" onclick="launchLinker()">
+                    <div class="game-meta-box">
+                        <div class="game-icon-badge badge-linker">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        </div>
+                        <div class="game-details">
+                            <h3>Node Linker Flow</h3>
+                            <p>Incinerate twin adjacent grid arrays.</p>
+                            <div class="game-live-counter">🟢 31.0K playing</div>
+                        </div>
+                    </div>
+                    <button class="play-action-btn">Play</button>
                 </div>
             </div>
         </div>
 
         <!-- SCREEN 1: REFLEX ARENA -->
         <div id="screen-reflex" class="screen">
-            <div class="game-header"><span style="color: var(--neon-purple);">⚡ Reflex Tap</span><span id="reflex-score" style="color: var(--neon-pink);">Score: 0</span></div>
+            <div class="game-header"><span style="color: #ff007f;">⚡ Reflex Tap</span><span id="reflex-score" style="color: #00f0ff;">Score: 0</span></div>
             <div class="reflex-grid">
                 <div class="reflex-node" id="node-0" onclick="tapNode(0)"></div>
                 <div class="reflex-node" id="node-1" onclick="tapNode(1)"></div>
@@ -250,22 +355,22 @@
 
         <!-- SCREEN 2: PUZZLE ARENA -->
         <div id="screen-puzzle" class="screen">
-            <div class="game-header"><span style="color: var(--neon-blue);">🧩 Word Matrix</span><span id="puzzle-timer" style="color: var(--neon-pink);">Time: 30s</span></div>
+            <div class="game-header"><span style="color: #9d4edd;">🧩 Word Matrix</span><span id="puzzle-timer" style="color: #ff007f;">Time: 30s</span></div>
             <div class="scramble-box" id="scrambled-display">-----</div>
-            <input type="text" id="puzzle-input" class="matrix-input" placeholder="Type verified cleartext...">
-            <button class="btn-action" onclick="submitPuzzleAnswer()">Verify Entry</button>
+            <input type="text" id="puzzle-input" class="matrix-input" placeholder="Decode encryption sequence...">
+            <button class="btn-action" onclick="submitPuzzleAnswer()">Verify Matrix</button>
         </div>
 
         <!-- SCREEN 3: TRIVIA ARENA -->
         <div id="screen-trivia" class="screen">
-            <div class="game-header"><span style="color: var(--neon-cyan);">🤖 AI Trivia</span><span id="trivia-timer" style="color: var(--neon-pink);">Time: 30s</span></div>
-            <div class="trivia-question" id="question-text">Loading secure prompt...</div>
+            <div class="game-header"><span style="color: #00f0ff;">🤖 AI Trivia</span><span id="trivia-timer" style="color: #ff007f;">Time: 30s</span></div>
+            <div class="trivia-question" id="question-text">Loading prompt array...</div>
             <div class="trivia-options-grid" id="options-box"></div>
         </div>
 
         <!-- SCREEN 4: MEMORY SEQUENCE GRID -->
         <div id="screen-memory" class="screen">
-            <div class="game-header"><span style="color: var(--neon-yellow);">🧠 Memory Grid</span><span id="memory-score" style="color: var(--neon-pink);">Level: 1</span></div>
+            <div class="game-header"><span style="color: #ffea00;">🧠 Memory Grid</span><span id="memory-score" style="color: #00f0ff;">Level: 1</span></div>
             <div class="reflex-grid">
                 <div class="reflex-node" id="mnode-0" onclick="tapMemoryNode(0)"></div>
                 <div class="reflex-node" id="mnode-1" onclick="tapMemoryNode(1)"></div>
@@ -277,38 +382,38 @@
                 <div class="reflex-node" id="mnode-7" onclick="tapMemoryNode(7)"></div>
                 <div class="reflex-node" id="mnode-8" onclick="tapMemoryNode(8)"></div>
             </div>
-            <div id="memory-status-text" style="font-size:0.85rem; font-weight:800; color:var(--neon-cyan)">WATCH SEQUENCE...</div>
+            <div id="memory-status-text" style="font-size:0.9rem; font-weight:800; color:#ffea00">WATCHING SYSTEM...</div>
         </div>
 
         <!-- SCREEN 5: CYBER DICE 21 -->
         <div id="screen-dice" class="screen">
-            <div class="game-header"><span style="color: var(--neon-pink);">🎲 Cyber-Dice 21</span><span id="dice-game-score" style="color: var(--neon-cyan);">Score: 0</span></div>
+            <div class="game-header"><span style="color: #ff2a6d;">🎲 Cyber-Dice 21</span><span id="dice-game-score" style="color: #00f0ff;">Score: 0</span></div>
             <div class="dice-board">
                 <div class="dice-score-flex">
-                    <div class="dice-score-box"><h4>Your Compilation</h4><div id="dice-player-total">0</div></div>
-                    <div class="dice-score-box"><h4>Host Dealer AI</h4><div id="dice-dealer-total">?</div></div>
+                    <div class="dice-score-box"><h4>Your Registry</h4><div id="dice-player-total">0</div></div>
+                    <div class="dice-score-box"><h4>AI Core</h4><div id="dice-dealer-total">?</div></div>
                 </div>
-                <div id="dice-status-msg" style="color:var(--neon-blue); font-size:0.9rem; font-weight:700;">CHOOSE ACTION MATRIX</div>
+                <div id="dice-status-msg" style="color:#00f0ff; font-size:1rem; font-weight:800;">REQUEST STACK HIT OR EXECUTE</div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-action" style="background:var(--neon-blue);" onclick="diceHit()">Load Data (Hit)</button>
-                <button class="btn-action" style="background:var(--neon-pink);" onclick="diceStand()">Execute (Stand)</button>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-action" style="background: linear-gradient(180deg, #00f0ff 0%, #0055ff 100%);" onclick="diceHit()">Hit Block</button>
+                <button class="btn-action" style="background: linear-gradient(180deg, #ff2a6d 0%, #b0003a 100%);" onclick="diceStand()">Stand Execution</button>
             </div>
         </div>
 
         <!-- SCREEN 6: NODE LINKER FLOW -->
         <div id="screen-linker" class="screen">
-            <div class="game-header"><span style="color: var(--neon-green);">🔗 Node Linker</span><span id="linker-timer" style="color: var(--neon-pink);">Time: 30s</span></div>
-            <div id="linker-score" style="font-weight:800; font-size:1.2rem; color:#fff; margin-bottom:5px;">Score: 0</div>
+            <div class="game-header"><span style="color: #39ff14;">🔗 Node Linker</span><span id="linker-timer" style="color: #ff007f;">Time: 30s</span></div>
+            <div id="linker-score" style="font-weight:900; font-size:1.4rem; color:#fff; margin-bottom:8px;">Score: 0</div>
             <div class="linker-grid" id="linker-container"></div>
-            <div style="font-size:0.8rem; color:var(--text-muted)">TAP TWO ADJACENT MATCHING NODES TO CLEAR</div>
+            <div style="font-size:0.85rem; color:var(--text-dim)">TAP TWO ADJACENT CORRESPONDING BLOCKS</div>
         </div>
 
-        <!-- SCREEN 7: RESULTS -->
+        <!-- SCREEN 7: RESULTS OVERLAY -->
         <div id="screen-results" class="screen">
-            <div style="font-size: 1.6rem; font-weight: 900; color: var(--neon-cyan); margin-bottom: 10px;">MATCH CONCLUDED</div>
-            <div style="font-size: 2.8rem; font-weight: 900; color: #ffffff; margin: 15px 0 25px 0; text-shadow: 0 0 20px var(--neon-blue);"><span id="display-final-score">0</span> <span style="font-size:1.1rem; color:var(--text-muted)">PTS</span></div>
-            <button class="btn-action" onclick="returnToLobby()">Return to Arcade Lobby</button>
+            <div style="font-size: 1.8rem; font-weight: 900; color: #39ff14; margin-bottom: 5px;">MATCH COMPLETED</div>
+            <div style="font-size: 3.2rem; font-weight: 900; color: #ffffff; margin: 15px 0 20px 0; filter: drop-shadow(0 0 15px #00f0ff);"><span id="display-final-score">0</span> <span style="font-size:1.2rem; color:var(--text-dim)">PTS</span></div>
+            <button class="btn-action" onclick="returnToLobby()">Return To Lobby</button>
         </div>
     </div>
 
@@ -338,11 +443,11 @@
             try {
                 await Pi.init({ version: "2.0", sandbox: true });
                 const auth = await Pi.authenticate(["username"], function(p){});
-                document.getElementById("auth-status").innerHTML = '<div class="status-dot"></div><span>Verified Nexus</span>';
+                document.getElementById("auth-status").innerHTML = '<div class="status-dot"></div><span>CONNECTED MATRIX</span>';
                 document.getElementById("player-username").textContent = auth.user.username;
             } catch (e) {
-                document.getElementById("auth-status").innerHTML = '<div class="status-dot" style="background:#ff007f; box-shadow:0 0 8px #ff007f;"></div><span>Local Override</span>';
-                document.getElementById("player-username").textContent = "Pioneer_Test_Mode";
+                document.getElementById("auth-status").innerHTML = '<div class="status-dot" style="background:#ff2a6d; box-shadow:0 0 8px #ff2a6d;"></div><span>SANDBOX ENVIRONMENT</span>';
+                document.getElementById("player-username").textContent = "Pioneer_Player";
             }
         }
 
@@ -441,16 +546,16 @@
         }
         function nextMemoryLevel() {
             isWaitingInput = false; playerSequence = [];
-            document.getElementById("memory-status-text").textContent = "WATCH SEQUENCE...";
-            document.getElementById("memory-status-text").style.color = "var(--neon-yellow)";
+            document.getElementById("memory-status-text").textContent = "WATCH MATRIX SYSTEM SEQUENCE...";
+            document.getElementById("memory-status-text").style.color = "#ffea00";
             memorySequence.push(Math.floor(Math.random() * 9));
             playSequence(0);
         }
         function playSequence(index) {
             if(index >= memorySequence.length) {
                 isWaitingInput = true;
-                document.getElementById("memory-status-text").textContent = "YOUR TURN! MATCH IT!";
-                document.getElementById("memory-status-text").style.color = "var(--neon-cyan)";
+                document.getElementById("memory-status-text").textContent = "DECODE PATTERN SEQUENCE NOW!";
+                document.getElementById("memory-status-text").style.color = "#00f0ff";
                 return;
             }
             let nodeNum = memorySequence[index];
@@ -495,16 +600,16 @@
             dealerDiceTotal = Math.floor(Math.random() * 8) + 8;
             document.getElementById("dice-player-total").textContent = playerDiceTotal;
             document.getElementById("dice-dealer-total").textContent = "?";
-            document.getElementById("dice-status-msg").textContent = "LOAD DATA OR STAND";
-            document.getElementById("dice-status-msg").style.color = "var(--neon-blue)";
+            document.getElementById("dice-status-msg").textContent = "LOAD DATA BLOCK OR STAND NOW";
+            document.getElementById("dice-status-msg").style.color = "#00f0ff";
         }
         function diceHit() {
             let card = Math.floor(Math.random() * 11) + 1;
             playerDiceTotal += card;
             document.getElementById("dice-player-total").textContent = playerDiceTotal;
             if(playerDiceTotal > 21) {
-                document.getElementById("dice-status-msg").textContent = "OVERLOAD! COMPILATION BUST.";
-                document.getElementById("dice-status-msg").style.color = "var(--neon-pink)";
+                document.getElementById("dice-status-msg").textContent = "BUFFER OVERLOAD! MATRIX CRASHED.";
+                document.getElementById("dice-status-msg").style.color = "#ff2a6d";
                 diceRoundsPlayed++;
                 setTimeout(resetDiceRound, 1500);
             }
@@ -513,15 +618,15 @@
             document.getElementById("dice-dealer-total").textContent = dealerDiceTotal;
             if(playerDiceTotal === 21) {
                 gameScore += 100;
-                document.getElementById("dice-status-msg").textContent = "PERFECT 21 MATRIX MULTIPLIER!";
-                document.getElementById("dice-status-msg").style.color = "var(--neon-green)";
+                document.getElementById("dice-status-msg").textContent = "PERFECT SEQUENCE VALUE COMPILATION!";
+                document.getElementById("dice-status-msg").style.color = "#39ff14";
             } else if(dealerDiceTotal > 21 || playerDiceTotal > dealerDiceTotal) {
                 gameScore += 50;
-                document.getElementById("dice-status-msg").textContent = "HOST ENGINES OVERRULED. WIN!";
-                document.getElementById("dice-status-msg").style.color = "var(--neon-cyan)";
+                document.getElementById("dice-status-msg").textContent = "HOST PROTOCOLS MASTERED. ENTRY SECURED!";
+                document.getElementById("dice-status-msg").style.color = "#00f0ff";
             } else {
-                document.getElementById("dice-status-msg").textContent = "HOST INTELLIGENCE OUTSCORED YOU.";
-                document.getElementById("dice-status-msg").style.color = "var(--neon-orange)";
+                document.getElementById("dice-status-msg").textContent = "CORE SYSTEM OUTALGORITHMED ENGINE INTEL.";
+                document.getElementById("dice-status-msg").style.color = "#ff7b00";
             }
             document.getElementById("dice-game-score").textContent = `Score: ${gameScore}`;
             diceRoundsPlayed++;
