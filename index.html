@@ -3,717 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillClash Arcade Hub</title>
+    <title>SkillClash AI Arena</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
         :root {
-            /* Hyper-Bright Arcade Palette */
-            --bg-main: #0b0f19;
-            --arcade-surface: #141a29;
-            --arcade-surface-hover: #1c2438;
-            
-            /* High-Voltage Cyber Accents */
+            --bg-dark: #050914;
+            --card-bg: #0c1322;
             --neon-green: #39ff14;
-            --neon-green-dim: #1f9e0b;
-            --cyber-dark: #070a12;
-            --electric-blue: #00d2ff;
-            --deep-blue: #0066ff;
-            
-            /* Game Gradients */
-            --grad-trivia: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            --grad-scramble: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);
-            --grad-reflex: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
-            --grad-memory: linear-gradient(135deg, #b34eff 0%, #5433ff 100%);
-            --grad-dice: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            --grad-linker: linear-gradient(135deg, #ff007f 0%, #7f00ff 100%);
-            
-            --text-light: #f0f4f8;
+            --text-main: #ffffff;
             --text-muted: #7e8fa9;
+            --play-counter: #00d2ff;
+            --locked-grey: #2a364d;
+            
+            --grad-trivia: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+            --grad-matrix: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            --grad-reflex: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
         }
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-main);
-            background-image: 
-                linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text-light);
-            margin: 0;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0; padding: 16px;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; box-sizing: border-box;
         }
 
-        .container {
-            max-width: 480px;
-            width: 100%;
-            background: rgba(11, 15, 25, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 32px;
-            padding: 20px 14px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-sizing: border-box;
-        }
-
-        /* PREMIUM BEAST-MODE HEADER */
-        .header-banner {
-            background: linear-gradient(180deg, #070a12 0%, #101626 100%);
-            border: 2px solid rgba(57, 255, 20, 0.4);
-            border-bottom: 5px solid var(--neon-green);
-            border-radius: 24px;
-            padding: 26px 15px;
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(57, 255, 20, 0.15), inset 0 0 20px rgba(57, 255, 20, 0.05);
-        }
-
-        /* Animated grid background inside header */
-        .header-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background-image: linear-gradient(rgba(57, 255, 20, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
-            background-size: 15px 15px;
-            transform: perspective(500px) rotateX(60deg);
-            opacity: 0.4;
-            pointer-events: none;
-        }
-
+        .app-wrapper { max-width: 440px; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+        .brand-header { text-align: center; padding: 10px 0; }
         .brand-title {
-            font-size: 2.8rem;
-            font-weight: 900;
-            font-style: italic;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            margin: 0;
-            background: linear-gradient(180deg, #ffffff 40%, var(--neon-green) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.6));
+            font-size: 2.4rem; font-weight: 900; letter-spacing: 2px; margin: 0 0 4px 0; text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--neon-green), #00d2ff, #fff); background-size: 300% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineTitle 4s linear infinite;
         }
+        @keyframes shineTitle { to { background-position: 300% center; } }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(57, 255, 20, 0.1);
-            border: 1px solid rgba(57, 255, 20, 0.3);
-            color: var(--neon-green);
-            padding: 5px 14px;
-            border-radius: 30px;
-            font-size: 0.72rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 14px;
+        .nexus-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(57, 255, 20, 0.08); border: 1px solid rgba(57, 255, 20, 0.3);
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; color: var(--neon-green); text-transform: uppercase;
         }
-        .status-dot { 
-            width: 8px; height: 8px; 
-            background-color: var(--neon-green); 
-            border-radius: 50%; 
-            box-shadow: 0 0 10px var(--neon-green);
-            animation: pulse 1.5s infinite;
+        .nexus-dot { width: 6px; height: 6px; background-color: var(--neon-green); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green); }
+
+        /* THE LIVE NEON CARD COMPONENT */
+        .game-card-row {
+            background-color: var(--card-bg); border-radius: 24px; padding: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            border: 1.5px solid rgba(57, 255, 20, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden;
         }
-
-        @keyframes pulse {
-            0% { transform: scale(0.9); opacity: 0.6; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(0.9); opacity: 0.6; }
-        }
-
-        /* Game List Layout */
-        .section-label {
-            text-align: left;
-            font-size: 1.05rem;
-            font-weight: 900;
-            margin: 20px 0 12px 6px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .mode-list { display: flex; flex-direction: column; gap: 14px; }
-
-        .game-row-card {
-            background: var(--arcade-surface);
-            border-radius: 24px;
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-        }
-
-        .game-row-card:hover {
-            background: var(--arcade-surface-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(57, 255, 20, 0.1);
-            border-color: rgba(57, 255, 20, 0.2);
-        }
-
-        .game-meta-box { display: flex; align-items: center; gap: 14px; text-align: left; }
-
-        /* Re-engineered High-Aesthetic Gaming Badges */
-        .game-icon-badge {
-            width: 64px;
-            height: 64px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-sizing: border-box;
-        }
+        .game-card-row:hover { border-color: var(--neon-green); transform: translateY(-2px); box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
+        .game-left-block { display: flex; align-items: center; gap: 14px; }
         
-        .game-icon-badge::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.3) 100%);
-            border-radius: 16px; pointer-events: none;
+        .game-icon-square {
+            width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1); animation: iconPulse 3s ease-in-out infinite alternate;
+        }
+        @keyframes iconPulse { 0% { transform: scale(1); } 100% { transform: scale(1.04); filter: brightness(1.1); } }
+        .icon-trivia { background: var(--grad-trivia); }
+        .icon-matrix { background: var(--grad-matrix); }
+        .icon-reflex { background: var(--grad-reflex); }
+
+        .icon-square-svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2.5; }
+        .game-info-text h3 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+        .game-info-text p { margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.3; max-width: 200px; }
+        .live-player-metric { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 900; color: var(--play-counter); margin-top: 2px; }
+        .metric-dot { width: 4px; height: 4px; background-color: var(--play-counter); border-radius: 50%; }
+
+        /* THE VAULT LOCKED ARCHITECTURE */
+        .game-card-row.vault-locked { border-color: var(--locked-grey); filter: grayscale(0.8); opacity: 0.55; cursor: not-allowed; }
+        .game-card-row.vault-locked:hover { transform: none; box-shadow: none; border-color: var(--locked-grey); }
+        .vault-tag { background: #1f2d47; color: #a3b8cc; font-size: 0.68rem; font-weight: 900; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .btn-play-action {
+            background: linear-gradient(180deg, #5dfd2d 0%, #17b302 100%); color: #03060d;
+            font-weight: 900; font-size: 0.8rem; padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; text-transform: uppercase;
         }
 
-        .badge-trivia { background: var(--grad-trivia); }
-        .badge-scramble { background: var(--grad-scramble); }
-        .badge-reflex { background: var(--grad-reflex); }
-        .badge-memory { background: var(--grad-memory); }
-        .badge-dice { background: var(--grad-dice); }
-        .badge-linker { background: var(--grad-linker); }
-
-        .game-icon-badge svg { width: 34px; height: 34px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
-
-        .game-details h3 { margin: 0 0 3px 0; font-size: 1.1rem; font-weight: 800; color: var(--text-light); }
-        .game-details p { margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.3; max-width: 200px; }
-        .game-live-counter { font-size: 0.72rem; color: var(--electric-blue); font-weight: 800; margin-top: 5px; display: flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* HYPER-BRIGHT NEON GREEN ACTION BUTTONS */
-        .play-action-btn {
-            background: linear-gradient(180deg, #51ff30 0%, #1fbf04 100%);
-            color: #070a12;
-            font-weight: 900;
-            font-size: 0.85rem;
-            padding: 10px 24px;
-            border-radius: 14px;
-            border: 1px solid #ffffff;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(57, 255, 20, 0.35);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* FIRST-TIME INSTRUCTION MODAL PACK */
+        .overlay-instruction-panel {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 5, 12, 0.97); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
         }
+        .instruction-modal-body { max-width: 380px; width: 100%; background: var(--card-bg); border: 2px solid var(--neon-green); border-radius: 24px; padding: 24px; text-align: center; }
+        .modal-headline { font-size: 1.3rem; font-weight: 900; color: var(--neon-green); margin-bottom: 10px; text-transform: uppercase; }
+        .modal-paragraph { font-size: 0.9rem; color: #d1dcfa; line-height: 1.5; margin-bottom: 20px; text-align: left; white-space: pre-line; }
+
+        /* ACTIVE MATRIX STAGE ARCHITECTURE */
+        .screen-instance { display: none; }
+        .screen-instance.active-layer { display: flex; flex-direction: column; }
+        .game-runtime-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #121b2e; border-radius: 16px; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 16px; }
+        .general-action-trigger { width: 100%; padding: 15px; background: linear-gradient(180deg, #0052ff 0%, #0036b3 100%); color: #fff; border: none; border-radius: 14px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
+
+        /* TRIVIA SCHEDULER VIEW */
+        .schedule-node-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #111a2e; border: 1px solid #1f2d47; border-radius: 12px; margin-bottom: 10px; }
+        .schedule-node-row.live-now { border-color: var(--neon-green); background: #16262b; }
+        .badge-live-now { background: var(--neon-green); color: #000; font-size: 0.68rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
+        .badge-lock-day { background: #1f2d47; color: var(--text-muted); font-size: 0.68rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
+
+        /* INTERFACE COMPONENT FIELDS */
+        .option-stack { display: flex; flex-direction: column; gap: 10px; }
+        .game-opt-btn { width: 100%; padding: 14px; background: #111a2e; border: 1px solid #1f2d47; border-radius: 12px; color: #fff; text-align: left; cursor: pointer; font-size: 0.95rem; }
+        .matrix-word-display { font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; text-align: center; color: #ff4b2b; margin: 20px 0; text-transform: uppercase; }
+        .matrix-text-entry { width: 100%; padding: 14px; background: #111a2e; border: 2px solid #1f2d47; border-radius: 12px; color: #fff; font-size: 1.1rem; text-align: center; box-sizing: border-box; text-transform: uppercase; outline: none; }
         
-        .game-row-card:hover .play-action-btn { 
-            transform: scale(1.08) scaleY(1.02); 
-            background: linear-gradient(180deg, #7cff63 0%, #29e008 100%);
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.7);
-        }
+        .reflex-node-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 15px 0; }
+        .node-tile { aspect-ratio: 1; background: #111a2e; border: 2px solid #1f2d47; border-radius: 16px; cursor: pointer; }
+        .node-tile.active-target { background: var(--grad-reflex); box-shadow: 0 0 15px #f5af19; border-color: #fff; }
 
-        /* Screen Configurations */
-        .screen { display: none; }
-        .active-screen { display: block; }
-
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 900; text-transform: uppercase; font-size: 0.95rem; background: #182238; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); color: var(--text-light); }
-
-        .btn-action {
-            width: 100%; padding: 16px;
-            background: linear-gradient(180deg, var(--deep-blue) 0%, #004bff 100%);
-            color: #fff; border: none; border-radius: 18px;
-            font-weight: 800; font-size: 1rem; text-transform: uppercase; cursor: pointer;
-            margin-top: 10px; box-shadow: 0 6px 20px rgba(0, 102, 255, 0.3);
-        }
-
-        /* Bright Grid Formations */
-        .reflex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-        .reflex-node { aspect-ratio: 1; background: #141a29; border: 2px solid #232d45; border-radius: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: all 0.1s; }
-        .reflex-node.active { background: var(--grad-reflex); box-shadow: 0 8px 24px rgba(241, 39, 17, 0.4); border-color: #ffffff; }
-        .reflex-node.mem-active { background: var(--grad-memory); box-shadow: 0 8px 24px rgba(84, 51, 255, 0.4); border-color: #ffffff; }
-
-        .scramble-box { font-size: 2.4rem; font-weight: 900; letter-spacing: 3px; color: #ff5858; text-shadow: 0 4px 12px rgba(255,88,88,0.2); margin: 25px 0; text-transform: uppercase; }
-        .matrix-input { width: 100%; padding: 16px; background: #141a29; border: 2px solid #232d45; border-radius: 16px; color: var(--text-light); font-size: 1.2rem; text-align: center; outline: none; box-sizing: border-box; text-transform: uppercase; margin-bottom: 15px; }
-        .matrix-input:focus { border-color: var(--deep-blue); box-shadow: 0 0 12px rgba(0,102,255,0.15); }
-
-        .trivia-question { font-size: 1.15rem; font-weight: 800; color: var(--text-light); margin: 20px 0; line-height: 1.4; text-align: left; }
-        .trivia-options-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; }
-        .option-btn { width: 100%; padding: 14px 18px; background: #141a29; border: 2px solid #232d45; border-radius: 14px; color: var(--text-light); text-align: left; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .option-btn:hover { background: #1c2438; border-color: var(--deep-blue); }
-
-        .dice-board { background: #141a29; border-radius: 22px; padding: 22px; border: 2px solid #232d45; margin: 20px 0; }
-        .dice-score-flex { display: flex; justify-content: space-around; margin-bottom: 15px; }
-        .dice-score-box h4 { margin: 0; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
-        .dice-score-box div { font-size: 2.4rem; font-weight: 900; color: var(--text-light); }
-
-        .linker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-        .linker-node { aspect-ratio: 1; background: #141a29; border: 2px solid #232d45; border-radius: 14px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .linker-node.selected { background: #2c1a2f; border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.2); }
+        /* RISK CONTROL RISK SYSTEM OVERLAY BLOCK */
+        .risk-modal-box { background: #121c30; border: 2px solid #ff416c; padding: 20px; border-radius: 20px; text-align: center; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- TOP HIGH-VOLTAGE NEON ARCADE BANNER -->
-        <div class="header-banner">
-            <h1 class="brand-title">SkillClash AI</h1>
-            <div id="auth-status" class="status-badge"><div class="status-dot"></div><span>SYNCING CORE</span></div>
-        </div>
-
-        <!-- SCREEN 0: ARCADE LOBBY -->
-        <div id="screen-lobby" class="screen active-screen">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin: 0 6px 15px 6px;">
-                <div style="text-align:left;"><span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Player Node</span><br><b id="player-username" style="color:var(--text-light); font-size:1.1rem;">Connecting...</b></div>
-                <div style="text-align:right;"><span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Personal Best</span><br><b id="lobby-high-score" style="color:var(--neon-green); font-size:1.2rem; font-weight: 900;">0</b></div>
-            </div>
-
-            <div class="section-label">🎮 Choose Arena Mode</div>
-            
-            <div class="mode-list">
-                <!-- GAME 1 -->
-                <div class="game-row-card" onclick="launchTrivia()">
-                    <div class="game-meta-box">
-                        <div class="game-icon-badge badge-trivia">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                <circle cx="12" cy="11" r="3"/>
-                                <line x1="12" y1="14" x2="12" y2="17"/>
-                            </svg>
-                        </div>
-                        <div class="game-details">
-                            <h3>AI Trivia Arena</h3>
-                            <p>High-speed cognitive database battles.</p>
-                            <div class="game-live-counter">🟢 41.2K playing</div>
-                        </div>
-                    </div>
-                    <button class="play-action-btn">Play</button>
-                </div>
-
-                <!-- GAME 2 -->
-                <div class="game-row-card" onclick="launchPuzzle()">
-                    <div class="game-meta-box">
-                        <div class="game-icon-badge badge-scramble">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="5"/>
-                                <line x1="12" y1="3" x2="12" y2="21"/>
-                                <line x1="3" y1="12" x2="21" y2="12"/>
-                                <circle cx="12" cy="12" r="4" fill="none"/>
-                            </svg>
-                        </div>
-                        <div class="game-details">
-                            <h3>Word Matrix</h3>
-                            <p>Deconstruct scrambled logic strings.</p>
-                            <div class="game-live-counter">🟢 28.7K playing</div>
-                        </div>
-                    </div>
-                    <button class="play-action-btn">Play</button>
-                </div>
-
-                <!-- GAME 3 -->
-                <div class="game-row-card" onclick="launchReflex()">
-                    <div class="game-meta-box">
-                        <div class="game-icon-badge badge-reflex">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="9"/>
-                                <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
-                                <circle cx="12" cy="12" r="2" fill="#fff"/>
-                            </svg>
-                        </div>
-                        <div class="game-details">
-                            <h3>Reflex Node Tap</h3>
-                            <p>Terminate localized targets instantly.</p>
-                            <div class="game-live-counter">🟢 35.1K playing</div>
-                        </div>
-                    </div>
-                    <button class="play-action-btn">Play</button>
-                </div>
-
-                <!-- GAME 4 -->
-                <div class="game-row-card" onclick="launchMemory()">
-                    <div class="game-meta-box">
-                        <div class="game-icon-badge badge-memory">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="7" height="7" rx="2" fill="#fff"/>
-                                <rect x="14" y="3" width="7" height="7" rx="2"/>
-                                <rect x="3" y="14" width="7" height="7" rx="2"/>
-                                <rect x="14" y="14" width="7" height="7" rx="2" fill="#fff"/>
-                            </svg>
-                        </div>
-                        <div class="game-details">
-                            <h3>Memory Grid</h3>
-                            <p>High-velocity sequence pattern recall.</p>
-                            <div class="game-live-counter">🟢 19.4K playing</div>
-                        </div>
-                    </div>
-                    <button class="play-action-btn">Play</button>
-                </div>
-
-                <!-- GAME 5 -->
-                <div class="game-row-card" onclick="launchDice()">
-                    <div class="game-meta-box">
-                        <div class="game-icon-badge badge-dice">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <div class="game-details">
-                            <h3>Cyber-Dice 21</h3>
-                            <p>Compile vectors to reach 21 safely.</p>
-                            <div class="game-live-counter">🟢 24.8K playing</div>
-                        </div>
-                    </div>
-                    <button class="play-action-btn">Play</button>
-                </div>
-
-                <!-- GAME 6 -->
-                <div class="game-row-card" onclick="launchLinker()">
-                    <div class="game-meta-box">
-                        <div class="game-icon-badge badge-linker">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="6" cy="6" r="3" fill="#fff"/>
-                                <circle cx="18" cy="18" r="3" fill="#fff"/>
-                                <line x1="8.12" y1="8.12" x2="15.88" y2="15.88"/>
-                                <line x1="12" y1="6" x2="18" y2="12" stroke-dasharray="2,2"/>
-                            </svg>
-                        </div>
-                        <div class="game-details">
-                            <h3>Node Linker Flow</h3>
-                            <p>Incinerate twin adjacent grid arrays.</p>
-                            <div class="game-live-counter">🟢 31.0K playing</div>
-                        </div>
-                    </div>
-                    <button class="play-action-btn">Play</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- SCREEN 1: REFLEX ARENA -->
-        <div id="screen-reflex" class="screen">
-            <div class="game-header"><span style="color: #f12711;">⚡ Reflex Tap</span><span id="reflex-score" style="color: var(--electric-blue);">Score: 0</span></div>
-            <div class="reflex-grid">
-                <div class="reflex-node" id="node-0" onclick="tapNode(0)"></div>
-                <div class="reflex-node" id="node-1" onclick="tapNode(1)"></div>
-                <div class="reflex-node" id="node-2" onclick="tapNode(2)"></div>
-                <div class="reflex-node" id="node-3" onclick="tapNode(3)"></div>
-                <div class="reflex-node" id="node-4" onclick="tapNode(4)"></div>
-                <div class="reflex-node" id="node-5" onclick="tapNode(5)"></div>
-                <div class="reflex-node" id="node-6" onclick="tapNode(6)"></div>
-                <div class="reflex-node" id="node-7" onclick="tapNode(7)"></div>
-                <div class="reflex-node" id="node-8" onclick="tapNode(8)"></div>
-            </div>
-        </div>
-
-        <!-- SCREEN 2: PUZZLE ARENA -->
-        <div id="screen-puzzle" class="screen">
-            <div class="game-header"><span style="color: #ff5858;">🧩 Word Matrix</span><span id="puzzle-timer" style="color: var(--electric-blue);">Time: 30s</span></div>
-            <div class="scramble-box" id="scrambled-display">-----</div>
-            <input type="text" id="puzzle-input" class="matrix-input" placeholder="Decode word pattern...">
-            <button class="btn-action" onclick="submitPuzzleAnswer()">Verify Matrix</button>
-        </div>
-
-        <!-- SCREEN 3: TRIVIA ARENA -->
-        <div id="screen-trivia" class="screen">
-            <div class="game-header"><span style="color: #4facfe;">🤖 AI Trivia</span><span id="trivia-timer" style="color: var(--electric-blue);">Time: 30s</span></div>
-            <div class="trivia-question" id="question-text">Loading question...</div>
-            <div class="trivia-options-grid" id="options-box"></div>
-        </div>
-
-        <!-- SCREEN 4: MEMORY SEQUENCE GRID -->
-        <div id="screen-memory" class="screen">
-            <div class="game-header"><span style="color: #5433ff;">🧠 Memory Grid</span><span id="memory-score" style="color: var(--electric-blue);">Level: 1</span></div>
-            <div class="reflex-grid">
-                <div class="reflex-node" id="mnode-0" onclick="tapMemoryNode(0)"></div>
-                <div class="reflex-node" id="mnode-1" onclick="tapMemoryNode(1)"></div>
-                <div class="reflex-node" id="mnode-2" onclick="tapMemoryNode(2)"></div>
-                <div class="reflex-node" id="mnode-3" onclick="tapMemoryNode(3)"></div>
-                <div class="reflex-node" id="mnode-4" onclick="tapMemoryNode(4)"></div>
-                <div class="reflex-node" id="mnode-5" onclick="tapMemoryNode(5)"></div>
-                <div class="reflex-node" id="mnode-6" onclick="tapMemoryNode(6)"></div>
-                <div class="reflex-node" id="mnode-7" onclick="tapMemoryNode(7)"></div>
-                <div class="reflex-node" id="mnode-8" onclick="tapMemoryNode(8)"></div>
-            </div>
-            <div id="memory-status-text" style="font-size:0.9rem; font-weight:800; color:#5433ff">WATCHING PATTERN...</div>
-        </div>
-
-        <!-- SCREEN 5: CYBER DICE 21 -->
-        <div id="screen-dice" class="screen">
-            <div class="game-header"><span style="color: #38ef7d;">🎲 Cyber-Dice 21</span><span id="dice-game-score" style="color: var(--electric-blue);">Score: 0</span></div>
-            <div class="dice-board">
-                <div class="dice-score-flex">
-                    <div class="dice-score-box"><h4>Your Registry</h4><div id="dice-player-total">0</div></div>
-                    <div class="dice-score-box"><h4>AI Core</h4><div id="dice-dealer-total">?</div></div>
-                </div>
-                <div id="dice-status-msg" style="color:var(--electric-blue); font-size:1rem; font-weight:800;">HIT OR STAND TO EXECUTE</div>
-            </div>
-            <div style="display:flex; gap:12px;">
-                <button class="btn-action" style="background: linear-gradient(180deg, var(--deep-blue) 0%, #004bff 100%);" onclick="diceHit()">Hit Block</button>
-                <button class="btn-action" style="background: linear-gradient(180deg, #ff5858 0%, #f12711 100%);" onclick="diceStand()">Stand Execution</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 6: NODE LINKER FLOW -->
-        <div id="screen-linker" class="screen">
-            <div class="game-header"><span style="color: #ff007f;">🔗 Node Linker</span><span id="linker-timer" style="color: var(--electric-blue);">Time: 30s</span></div>
-            <div id="linker-score" style="font-weight:900; font-size:1.4rem; color:var(--text-light); margin-bottom:8px;">Score: 0</div>
-            <div class="linker-grid" id="linker-container"></div>
-            <div style="font-size:0.85rem; color:var(--text-muted)">TAP TWO ADJACENT MATCHING SYMBOLS</div>
-        </div>
-
-        <!-- SCREEN 7: RESULTS OVERLAY -->
-        <div id="screen-results" class="screen">
-            <div style="font-size: 1.8rem; font-weight: 900; color: #38ef7d; margin-bottom: 5px;">MATCH COMPLETED</div>
-            <div style="font-size: 3.2rem; font-weight: 900; color: var(--text-light); margin: 15px 0 20px 0;"><span id="display-final-score">0</span> <span style="font-size:1.2rem; color:var(--text-muted)">PTS</span></div>
-            <button class="btn-action" style="background: linear-gradient(180deg, #51ff30 0%, #1fbf04 100%); color: #070a12;" onclick="returnToLobby()">Return To Lobby</button>
+    <div id="instruction-overlay" class="overlay-instruction-panel">
+        <div class="instruction-modal-body">
+            <div id="modal-title" class="modal-headline">SYSTEM GUIDE</div>
+            <div id="modal-text" class="modal-paragraph">Instructions.</div>
+            <button class="btn-play-action" style="width: 100%;" onclick="dismissInstructionScreen()">ENTER STREAM</button>
         </div>
     </div>
 
-    <script>
-        // Game State Core Engine
-        let activeNodeIndex = -1;
-        let gameScore = 0;
-        let reflexTimer;
-        let countdownInterval;
-        let totalHits = 0;
-        let timeLeft = 30;
-        let currentTargetWord = "";
-        let currentTriviaIndex = 0;
+    <div class="app-wrapper">
+        
+        <div class="brand-header">
+            <h1 class="brand-title">SkillClash AI</h1>
+            <div class="nexus-badge"><div class="nexus-dot"></div><span>COMPETITIVE MAINNET SEED</span></div>
+        </div>
 
-        const wordRepository = ["BLOCKCHAIN", "CRYPTO", "PIONEER", "NETWORK", "SECURITY", "MATRIX", "MINING", "VALIDATOR"];
-        const triviaRepository = [
-            { q: "What is the primary mechanism used to secure a blockchain data ledger?", o: ["Proof of Work / Stake", "Central Firewalls", "SQL Encryption Tables", "Cloud Backup Sync"], a: 0 },
-            { q: "Which component executes automated logical contracts inside decentralized ecosystems?", o: ["Hardware Wallets", "Smart Contracts Engine", "File Allocation Tables", "Peer Domain Routers"], a: 1 },
-            { q: "What process verifies data validity transactions across fully distributed networks?", o: ["Asynchronous Compiling", "Distributed Consensus", "Localized Kernel Auditing", "Macro Thread Queues"], a: 2 }
+        <div id="layer-lobby" class="screen-instance active-layer" style="gap: 12px;">
+            
+            <div class="game-card-row">
+                <div class="game-left-block">
+                    <div class="game-icon-square icon-trivia"><svg class="icon-square-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                    <div class="game-info-text">
+                        <h3>AI Trivia Arena</h3>
+                        <p>Daily rotating theme pools.</p>
+                        <div class="live-player-metric"><div class="metric-dot"></div><span>41.2K POOLED</span></div>
+                    </div>
+                </div>
+                <button class="btn-play-action" onclick="verifyTutorialRequirement('trivia')">PLAY</button>
+            </div>
+
+            <div class="game-card-row">
+                <div class="game-left-block">
+                    <div class="game-icon-square icon-matrix"><svg class="icon-square-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/></svg></div>
+                    <div class="game-info-text">
+                        <h3>Word Matrix</h3>
+                        <p>Deconstruct velocity string cache.</p>
+                        <div class="live-player-metric"><div class="metric-dot"></div><span>28.7K POOLED</span></div>
+                    </div>
+                </div>
+                <button class="btn-play-action" onclick="verifyTutorialRequirement('matrix')">PLAY</button>
+            </div>
+
+            <div class="game-card-row">
+                <div class="game-left-block">
+                    <div class="game-icon-square icon-reflex"><svg class="icon-square-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/></svg></div>
+                    <div class="game-info-text">
+                        <h3>Reflex Node Tap</h3>
+                        <p>Endless velocity escalation testing.</p>
+                        <div class="live-player-metric"><div class="metric-dot"></div><span>35.1K POOLED</span></div>
+                    </div>
+                </div>
+                <button class="btn-play-action" onclick="verifyTutorialRequirement('reflex')">PLAY</button>
+            </div>
+
+            <div class="game-card-row vault-locked">
+                <div class="game-left-block">
+                    <div style="background:#222c3e" class="game-icon-square">🔒</div>
+                    <div class="game-info-text">
+                        <h3>Memory Grid Match</h3>
+                        <p>Sequence configuration replication.</p>
+                    </div>
+                </div>
+                <div class="vault-tag">S2 VAULT</div>
+            </div>
+
+            <div class="game-card-row vault-locked">
+                <div class="game-left-block">
+                    <div style="background:#222c3e" class="game-icon-square">🔒</div>
+                    <div class="game-info-text">
+                        <h3>Cyber-Dice 21</h3>
+                        <p>High stakes arithmetic wagers.</p>
+                    </div>
+                </div>
+                <div class="vault-tag">S2 VAULT</div>
+            </div>
+
+            <div class="game-card-row vault-locked">
+                <div class="game-left-block">
+                    <div style="background:#222c3e" class="game-icon-square">🔒</div>
+                    <div class="game-info-text">
+                        <h3>Node Linker Flow</h3>
+                        <p>Incinerate dual identical matrix elements.</p>
+                    </div>
+                </div>
+                <div class="vault-tag">S2 VAULT</div>
+            </div>
+        </div>
+
+        <div id="layer-trivia-hub" class="screen-instance">
+            <div class="game-runtime-header"><span>📅 Daily Arena Schedule</span></div>
+            
+            <div class="schedule-node-row live-now">
+                <div><strong>💻 TODAY: Tech & AI Arena</strong><br><small style="color:var(--neon-green)">Pool: 5,000 Pi Allocated</small></div>
+                <span class="badge-live-now" onclick="launchActiveSpotlightQuiz()">LAUNCH</span>
+            </div>
+            <div class="schedule-node-row">
+                <div><strong>⚽ TOMORROW: Global Sports</strong><br><small style="color:var(--text-muted)">Unlocks in 14h 32m</small></div>
+                <span class="badge-lock-day">LOCKED</span>
+            </div>
+            <div class="schedule-node-row">
+                <div><strong>🎬 THURSDAY: Pop Culture & Box Office</strong><br><small style="color:var(--text-muted)">Unlocks in 38h 12m</small></div>
+                <span class="badge-lock-day">LOCKED</span>
+            </div>
+            
+            <button class="general-action-trigger" style="background:#ff0844;" onclick="exitToLobby()">Aborted Arena Link</button>
+        </div>
+
+        <div id="layer-trivia-play" class="screen-instance">
+            <div class="game-runtime-header"><span>Tech & AI Spotlight</span><span id="txt-trivia-multiplier">1.0x Mult</span></div>
+            <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;" id="txt-question-box">Parsing database element...</div>
+            <div class="option-stack" id="container-options-stack"></div>
+        </div>
+
+        <div id="layer-matrix-play" class="screen-instance">
+            <div class="game-runtime-header"><span>Puzzle Streak: <span id="matrix-streak-counter">0</span></span><span id="matrix-clock">30s</span></div>
+            <div class="matrix-word-display" id="txt-scrambled-string">------</div>
+            <input type="text" id="input-matrix-cleartext" class="matrix-text-entry" placeholder="Unscramble word string...">
+            <button class="general-action-trigger" onclick="evaluateMatrixAttempt()">Submit String Verification</button>
+        </div>
+
+        <div id="layer-reflex-play" class="screen-instance">
+            <div class="game-runtime-header"><span>Speed: <span id="txt-reflex-speed">100%</span></span><span style="color:var(--neon-green)" id="txt-reflex-pts">Pending: 0 Pts</span></div>
+            <div class="reflex-node-matrix">
+                <div class="node-tile" id="tile-0" onclick="registerTileTap(0)"></div><div class="node-tile" id="tile-1" onclick="registerTileTap(1)"></div><div class="node-tile" id="tile-2" onclick="registerTileTap(2)"></div>
+                <div class="node-tile" id="tile-3" onclick="registerTileTap(3)"></div><div class="node-tile" id="tile-4" onclick="registerTileTap(4)"></div><div class="node-tile" id="tile-5" onclick="registerTileTap(5)"></div>
+                <div class="node-tile" id="tile-6" onclick="registerTileTap(6)"></div><div class="node-tile" id="tile-7" onclick="registerTileTap(7)"></div><div class="node-tile" id="tile-8" onclick="registerTileTap(8)"></div>
+            </div>
+        </div>
+
+        <div id="layer-risk-console" class="screen-instance">
+            <div class="risk-modal-box">
+                <h2 style="color:#ff416c; margin:0 0 10px 0; font-weight:900;">⚠️ BANK OR BUST</h2>
+                <p style="font-size:0.95rem; line-height:1.4; color:#a3b8cc;">You completed the phase loop! You are holding <strong style="color:#fff" id="txt-unsecured-pts">0</strong> unverified points.</p>
+                <p style="font-size:0.85rem; color:#ff416c;">If you continue to the next speed tier and miss, your record wipes out entirely.</p>
+            </div>
+            <button class="general-action-trigger" style="background:linear-gradient(180deg, #5dfd2d 0%, #17b302 100%); color:#000;" onclick="bankPointsSecurely()">💰 SECURE & BANK POINTS</button>
+            <button class="general-action-trigger" style="background:#ff416c;" onclick="riskItAllAndEscalate()">🔥 RISK IT ALL (ESCALATE DIFF)</button>
+        </div>
+
+        <div id="layer-score-terminal" class="screen-instance" style="text-align:center;">
+            <div style="font-size: 1.6rem; font-weight:900; color:#ff0844;">BUSTED OUT</div>
+            <p style="color:var(--text-muted)">You pushed your luck too far and lost your unsecured points cache.</p>
+            <div style="font-size: 3rem; font-weight:900; margin: 20px 0; color:#fff;">0 PTS RECORDED</div>
+            <button class="general-action-trigger" onclick="exitToLobby()">Return To Core Lobby</button>
+        </div>
+
+    </div>
+
+    <script>
+        let runtimeScore = 0;
+        let runningStreak = 0;
+        let globalCountdown;
+        let queuedGameKey = '';
+        let targetWord = '';
+        let currentQuestionStep = 0;
+        let reflexVelocityTier = 1;
+
+        const manualDirectory = {
+            'trivia': "🏆 INSTRUCTION MANUAL: DAF SPOTLIGHT ARENA\n\nNiches are now locked behind a daily rotating spotlight calendar to maximize match liquidity.\n\nToday is TECH & AI. Each consecutive prompt answered adds +0.5x to your final scoring weight. Failing a question terminates your multiplier link instantly.",
+            'matrix': "🧩 INSTRUCTION MANUAL: MATRIX STRING\n\nDeconstruct randomized character groupings. Correct cleartext inputs stack onto an endless chain streak. Words get longer with every completion loop. A wrong answer breaks your run.",
+            'reflex': "⚡ INSTRUCTION MANUAL: ENDLESS RISK TAPS\n\nTiles illuminate at rapid speeds. Clear a round of 10 nodes to trigger the BANK OR BUST state.\n\nYou must choose whether to securely bank your accumulation score to leaderboards, or risk it for accelerated speed runs with higher multipliers!"
+        };
+
+        const activeTechQuestions = [
+            {q:"What engine component runs distributed smart contract logic on the 2026 updated Pi network?", o:["SQL Engine Layers","WebAssembly (WASM) Isolation","Python Kernels","Centralized API Gateways"], a:1},
+            {q:"What cryptography layer prevents tracing records backwards inside blocks?", o:["One-Way Hash Sequences","Symmetric Salts","Dynamic Zip Compressions","Local Partition Arrays"], a:0}
         ];
 
-        document.addEventListener("DOMContentLoaded", () => { initializePiHub(); });
+        const matrixLexicon = ["NODE", "BLOCK", "TOKEN", "KERNEL", "CIRCUIT", "VALIDATOR"];
 
-        async function initializePiHub() {
-            updateLobbyHighScoreDisplay();
-            try {
-                await Pi.init({ version: "2.0", sandbox: true });
-                const auth = await Pi.authenticate(["username"], function(p){});
-                document.getElementById("auth-status").innerHTML = '<div class="status-dot"></div><span>CONNECTED</span>';
-                document.getElementById("player-username").textContent = auth.user.username;
-            } catch (e) {
-                document.getElementById("auth-status").innerHTML = '<div class="status-dot" style="background:#ff416c;"></div><span>SANDBOX MODE</span>';
-                document.getElementById("player-username").textContent = "Pioneer_Player";
+        function verifyTutorialRequirement(gameKey) {
+            queuedGameKey = gameKey;
+            if(!localStorage.getItem(`clash_v2_tutorial_${gameKey}`)) {
+                document.getElementById("modal-title").textContent = gameKey.toUpperCase() + " OPERATION SPEC";
+                document.getElementById("modal-text").innerText = manualDirectory[gameKey];
+                document.getElementById("instruction-overlay").style.display = "flex";
+                localStorage.setItem(`clash_v2_tutorial_${gameKey}`, "true");
+            } else {
+                dismissInstructionScreen();
             }
         }
 
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.getElementById(screenId).classList.add('active-screen');
+        function dismissInstructionScreen() {
+            document.getElementById("instruction-overlay").style.display = "none";
+            runningStreak = 0; runtimeScore = 0; reflexVelocityTier = 1;
+            if(queuedGameKey === 'trivia') changeViewLayer('layer-trivia-hub');
+            if(queuedGameKey === 'matrix') bootMatrixArena();
+            if(queuedGameKey === 'reflex') bootReflexArena();
         }
 
-        function runGlobalTimer(labelId) {
-            timeLeft = 30;
-            document.getElementById(labelId).textContent = `Time: ${timeLeft}s`;
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById(labelId).textContent = `Time: ${timeLeft}s`;
-                if(timeLeft <= 0) endGame();
+        function changeViewLayer(id) {
+            document.querySelectorAll('.screen-instance').forEach(s => s.classList.remove('active-layer'));
+            document.getElementById(id).classList.add('active-layer');
+        }
+
+        function launchActiveSpotlightQuiz() {
+            currentQuestionStep = 0; runningStreak = 1.0; runtimeScore = 0;
+            changeViewLayer('layer-trivia-play'); renderTriviaSequence();
+        }
+
+        function renderTriviaSequence() {
+            document.getElementById("txt-trivia-multiplier").textContent = `${runningStreak.toFixed(1)}x Mult`;
+            let node = activeTechQuestions[currentQuestionStep];
+            if(!node) { bankPointsSecurely(); return; }
+            
+            document.getElementById("txt-question-box").textContent = node.q;
+            let stack = document.getElementById("container-options-stack"); stack.innerHTML = "";
+            node.o.forEach((opt, idx) => {
+                let b = document.createElement("button"); b.className = "game-opt-btn"; b.textContent = opt;
+                b.onclick = () => {
+                    if(idx === node.a) { runtimeScore += Math.round(40 * runningStreak); runningStreak += 0.5; currentQuestionStep++; renderTriviaSequence(); }
+                    else { changeViewLayer('layer-score-terminal'); }
+                };
+                stack.appendChild(b);
+            });
+        }
+
+        function bootMatrixArena() { changeViewLayer('layer-matrix-play'); runMatrixStep(); }
+        function runMatrixStep() {
+            document.getElementById("matrix-streak-counter").textContent = runningStreak;
+            targetWord = matrixLexicon[Math.min(matrixLexicon.length - 1, Math.floor(runningStreak / 2))];
+            document.getElementById("txt-scrambled-string").textContent = targetWord.split('').sort(() => Math.random() - 0.5).join('');
+            
+            let timeAllocated = Math.max(10, 30 - runningStreak * 2);
+            let left = timeAllocated; document.getElementById("matrix-clock").textContent = `${left}s`;
+            clearInterval(globalCountdown);
+            globalCountdown = setInterval(() => {
+                left--; document.getElementById("matrix-clock").textContent = `${left}s`;
+                if(left <= 0) changeViewLayer('layer-score-terminal');
             }, 1000);
         }
 
-        function updateLobbyHighScoreDisplay() {
-            let currentHighScore = localStorage.getItem("skillclash_highscore") || 0;
-            document.getElementById("lobby-high-score").textContent = currentHighScore;
+        function evaluateMatrixAttempt() {
+            if(document.getElementById("input-matrix-cleartext").value.trim().toUpperCase() === targetWord) {
+                runtimeScore += 50 * (1 + runningStreak * 0.2); runningStreak++;
+                document.getElementById("input-matrix-cleartext").value = ""; runMatrixStep();
+            } else { clearInterval(globalCountdown); changeViewLayer('layer-score-terminal'); }
         }
 
-        // --- GAME 1: REFLEX ---
-        function launchReflex() {
-            switchScreen('screen-reflex');
-            gameScore = 0; totalHits = 0;
-            document.getElementById("reflex-score").textContent = "Score: 0";
-            nextReflexCycle();
-        }
-        function nextReflexCycle() {
-            if(activeNodeIndex !== -1) document.getElementById(`node-${activeNodeIndex}`).classList.remove('active');
-            if(totalHits >= 12) { endGame(); return; }
-            activeNodeIndex = Math.floor(Math.random() * 9);
-            document.getElementById(`node-${activeNodeIndex}`).classList.add('active');
-            clearTimeout(reflexTimer);
-            reflexTimer = setTimeout(() => { totalHits++; nextReflexCycle(); }, 800);
-        }
-        function tapNode(index) {
-            if(index === activeNodeIndex) { gameScore += 10; document.getElementById("reflex-score").textContent = `Score: ${gameScore}`; totalHits++; nextReflexCycle(); }
-        }
-
-        // --- GAME 2: WORD MATRIX ---
-        function launchPuzzle() {
-            switchScreen('screen-puzzle');
-            gameScore = 0; document.getElementById("puzzle-input").value = "";
-            generateNewPuzzleWord(); runGlobalTimer("puzzle-timer");
-        }
-        function generateNewPuzzleWord() {
-            currentTargetWord = wordRepository[Math.floor(Math.random() * wordRepository.length)];
-            let scrambled = currentTargetWord.split('').sort(() => Math.random() - 0.5).join('');
-            if(scrambled === currentTargetWord) scrambled = scrambled.split('').reverse().join('');
-            document.getElementById("scrambled-display").textContent = scrambled;
-        }
-        function submitPuzzleAnswer() {
-            if(document.getElementById("puzzle-input").value.trim().toUpperCase() === currentTargetWord) {
-                gameScore += 25; document.getElementById("puzzle-input").value = ""; generateNewPuzzleWord();
-            } else { document.getElementById("puzzle-input").value = ""; }
-        }
-
-        // --- GAME 3: AI TRIVIA ---
-        function launchTrivia() {
-            switchScreen('screen-trivia');
-            gameScore = 0; currentTriviaIndex = 0;
-            renderTriviaQuestion(); runGlobalTimer("trivia-timer");
-        }
-        function renderTriviaQuestion() {
-            const currentQ = triviaRepository[currentTriviaIndex];
-            document.getElementById("question-text").textContent = currentQ.q;
-            const optionsBox = document.getElementById("options-box");
-            optionsBox.innerHTML = "";
-            currentQ.o.forEach((option, idx) => {
-                const btn = document.createElement("button");
-                btn.className = "option-btn"; btn.textContent = `${idx + 1}. ${option}`;
-                btn.onclick = () => selectTriviaOption(idx); optionsBox.appendChild(btn);
-            });
-        }
-        function selectTriviaOption(selectedIdx) {
-            if(selectedIdx === triviaRepository[currentTriviaIndex].a) { gameScore += 30; }
-            currentTriviaIndex = (currentTriviaIndex + 1) % triviaRepository.length;
-            renderTriviaQuestion();
-        }
-
-        // --- GAME 4: MEMORY GRID ---
-        let memorySequence = []; let playerSequence = []; let memoryLevel = 1; let isWaitingInput = false;
-        function launchMemory() {
-            switchScreen('screen-memory');
-            gameScore = 0; memoryLevel = 1; memorySequence = [];
-            document.getElementById("memory-score").textContent = `Level: ${memoryLevel}`;
-            nextMemoryLevel();
-        }
-        function nextMemoryLevel() {
-            isWaitingInput = false; playerSequence = [];
-            document.getElementById("memory-status-text").textContent = "WATCHING SEQUENCE PATTERN...";
-            memorySequence.push(Math.floor(Math.random() * 9));
-            playSequence(0);
-        }
-        function playSequence(index) {
-            if(index >= memorySequence.length) {
-                isWaitingInput = true;
-                document.getElementById("memory-status-text").textContent = "REPLAY SEQUENCE NOW!";
-                return;
+        let tileTimer, targetedTileIndex = -1, reflexTapsCount = 0;
+        function bootReflexArena() { changeViewLayer('layer-reflex-play'); reflexTapsCount = 0; fireReflexStep(); }
+        function fireReflexStep() {
+            document.getElementById("txt-reflex-speed").textContent = `${100 + (reflexVelocityTier - 1) * 30}%`;
+            document.getElementById("txt-reflex-pts").textContent = `Pending: ${runtimeScore} Pts`;
+            if(targetedTileIndex !== -1) document.getElementById(`tile-${targetedTileIndex}`).classList.remove('active-target');
+            
+            if(reflexTapsCount >= 10) {
+                document.getElementById("txt-unsecured-pts").textContent = runtimeScore;
+                changeViewLayer('layer-risk-console'); return;
             }
-            let nodeNum = memorySequence[index];
-            let element = document.getElementById(`mnode-${nodeNum}`);
-            element.classList.add('mem-active');
-            setTimeout(() => {
-                element.classList.remove('mem-active');
-                setTimeout(() => { playSequence(index + 1); }, 200);
-            }, 500);
-        }
-        function tapMemoryNode(num) {
-            if(!isWaitingInput) return;
-            playerSequence.push(num);
-            let clickedElement = document.getElementById(`mnode-${num}`);
-            clickedElement.classList.add('mem-active');
-            setTimeout(() => clickedElement.classList.remove('mem-active'), 150);
-
-            if(playerSequence[playerSequence.length - 1] !== memorySequence[playerSequence.length - 1]) {
-                gameScore = (memoryLevel - 1) * 50; endGame(); return;
-            }
-            if(playerSequence.length === memorySequence.length) {
-                memoryLevel++;
-                document.getElementById("memory-score").textContent = `Level: ${memoryLevel}`;
-                setTimeout(nextMemoryLevel, 800);
-            }
+            
+            targetedTileIndex = Math.floor(Math.random() * 9);
+            document.getElementById(`tile-${targetedTileIndex}`).classList.add('active-target');
+            let baselineSpeed = Math.max(220, 750 - (reflexVelocityTier * 90));
+            clearTimeout(tileTimer); tileTimer = setTimeout(() => { changeViewLayer('layer-score-terminal'); }, baselineSpeed);
         }
 
-        // --- GAME 5: CYBER DICE 21 ---
-        let playerDiceTotal = 0; let dealerDiceTotal = 0; let diceRoundsPlayed = 0;
-        function launchDice() {
-            switchScreen('screen-dice');
-            gameScore = 0; playerDiceTotal = 0; dealerDiceTotal = 0; diceRoundsPlayed = 0;
-            document.getElementById("dice-game-score").textContent = "Score: 0";
-            resetDiceRound();
-        }
-        function resetDiceRound() {
-            if(diceRoundsPlayed >= 5) { endGame(); return; }
-            playerDiceTotal = Math.floor(Math.random() * 10) + 2;
-            dealerDiceTotal = Math.floor(Math.random() * 8) + 8;
-            document.getElementById("dice-player-total").textContent = playerDiceTotal;
-            document.getElementById("dice-dealer-total").textContent = "?";
-            document.getElementById("dice-status-msg").textContent = "HIT BLOCK OR STAND EXECUTION";
-        }
-        function diceHit() {
-            let card = Math.floor(Math.random() * 11) + 1;
-            playerDiceTotal += card;
-            document.getElementById("dice-player-total").textContent = playerDiceTotal;
-            if(playerDiceTotal > 21) {
-                document.getElementById("dice-status-msg").textContent = "OVERLOAD! VALUE CRASHED.";
-                diceRoundsPlayed++; setTimeout(resetDiceRound, 1500);
-            }
-        }
-        function diceStand() {
-            document.getElementById("dice-dealer-total").textContent = dealerDiceTotal;
-            if(playerDiceTotal === 21) { gameScore += 100; } 
-            else if(dealerDiceTotal > 21 || playerDiceTotal > dealerDiceTotal) { gameScore += 50; }
-            document.getElementById("dice-game-score").textContent = `Score: ${gameScore}`;
-            diceRoundsPlayed++; setTimeout(resetDiceRound, 1800);
+        function registerTileTap(idx) {
+            if(idx === targetedTileIndex) {
+                runtimeScore += Math.round(15 * (1 + (reflexVelocityTier * 0.25))); reflexTapsCount++; fireReflexStep();
+            } else { clearTimeout(tileTimer); changeViewLayer('layer-score-terminal'); }
         }
 
-        // --- GAME 6: NODE LINKER FLOW ---
-        const linkerIcons = ["🪙", "🛡️", "⚡", "🧩"]; let linkerGridArray = []; let selectedLinkerIndex = -1;
-        function launchLinker() {
-            switchScreen('screen-linker');
-            gameScore = 0; selectedLinkerIndex = -1;
-            document.getElementById("linker-score").textContent = "Score: 0";
-            buildLinkerGrid(); runGlobalTimer("linker-timer");
-        }
-        function buildLinkerGrid() {
-            const container = document.getElementById("linker-container"); container.innerHTML = ""; linkerGridArray = [];
-            for(let i=0; i<16; i++) {
-                let randomIcon = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
-                linkerGridArray.push(randomIcon);
-                let cell = document.createElement("div"); cell.className = "linker-node"; cell.id = `lnode-${i}`;
-                cell.textContent = randomIcon; cell.onclick = () => tapLinkerNode(i); container.appendChild(cell);
-            }
-        }
-        function tapLinkerNode(idx) {
-            if(selectedLinkerIndex === -1) {
-                selectedLinkerIndex = idx; document.getElementById(`lnode-${idx}`).classList.add('selected');
-            } else {
-                let prevIdx = selectedLinkerIndex; document.getElementById(`lnode-${prevIdx}`).classList.remove('selected');
-                selectedLinkerIndex = -1; if(prevIdx === idx) return;
-
-                let r1 = Math.floor(prevIdx / 4), c1 = prevIdx % 4;
-                let r2 = Math.floor(idx / 4), c2 = idx % 4;
-                if((Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1 && linkerGridArray[prevIdx] === linkerGridArray[idx]) {
-                    gameScore += 40; document.getElementById("linker-score").textContent = `Score: ${gameScore}`;
-                    linkerGridArray[prevIdx] = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
-                    linkerGridArray[idx] = linkerIcons[Math.floor(Math.random() * linkerIcons.length)];
-                    document.getElementById(`lnode-${prevIdx}`).textContent = linkerGridArray[prevIdx];
-                    document.getElementById(`lnode-${idx}`).textContent = linkerGridArray[idx];
-                }
-            }
+        function riskItAllAndEscalate() { reflexVelocityTier++; reflexTapsCount = 0; changeViewLayer('layer-reflex-play'); fireReflexStep(); }
+        
+        function bankPointsSecurely() {
+            alert(`DATA LINK SYNC: Securing ${runtimeScore} points to database cache registries.`);
+            exitToLobby();
         }
 
-        // --- GLOBAL CONTROL ---
-        function endGame() {
-            clearTimeout(reflexTimer); clearInterval(countdownInterval);
-            document.getElementById("display-final-score").textContent = gameScore;
-            let high = localStorage.getItem("skillclash_highscore") || 0;
-            if(gameScore > parseInt(high)) localStorage.setItem("skillclash_highscore", gameScore);
-            switchScreen('screen-results');
-        }
-        function returnToLobby() { updateLobbyHighScoreDisplay(); switchScreen('screen-lobby'); }
+        function exitToLobby() { clearInterval(globalCountdown); clearTimeout(tileTimer); changeViewLayer('layer-lobby'); }
     </script>
 </body>
 </html>
