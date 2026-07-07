@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
+    
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
     <style>
         :root {
             --bg-dark: #050914;
@@ -90,19 +92,19 @@
         .modal-headline { font-size: 1.3rem; font-weight: 900; color: var(--neon-green); margin-bottom: 10px; text-transform: uppercase; }
         .modal-paragraph { font-size: 0.9rem; color: #d1dcfa; line-height: 1.5; margin-bottom: 20px; text-align: left; white-space: pre-line; }
 
-        /* ACTIVE MATRIX STAGE ARCHITECTURE */
+        /* APPLICATION LAYER BLOCKS */
         .screen-instance { display: none; }
         .screen-instance.active-layer { display: flex; flex-direction: column; }
         .game-runtime-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #121b2e; border-radius: 16px; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 16px; }
         .general-action-trigger { width: 100%; padding: 15px; background: linear-gradient(180deg, #0052ff 0%, #0036b3 100%); color: #fff; border: none; border-radius: 14px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
 
-        /* TRIVIA SCHEDULER VIEW */
+        /* TRIVIA CALENDAR SCHEDULE STYLING */
         .schedule-node-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #111a2e; border: 1px solid #1f2d47; border-radius: 12px; margin-bottom: 10px; }
         .schedule-node-row.live-now { border-color: var(--neon-green); background: #16262b; }
-        .badge-live-now { background: var(--neon-green); color: #000; font-size: 0.68rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
-        .badge-lock-day { background: #1f2d47; color: var(--text-muted); font-size: 0.68rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
+        .badge-live-now { background: var(--neon-green); color: #000; font-size: 0.68rem; font-weight: 900; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .badge-lock-day { background: #1f2d47; color: var(--text-muted); font-size: 0.68rem; font-weight: 900; padding: 6px 12px; border-radius: 6px; }
 
-        /* INTERFACE COMPONENT FIELDS */
+        /* GAME LAYOUT OBJECTS */
         .option-stack { display: flex; flex-direction: column; gap: 10px; }
         .game-opt-btn { width: 100%; padding: 14px; background: #111a2e; border: 1px solid #1f2d47; border-radius: 12px; color: #fff; text-align: left; cursor: pointer; font-size: 0.95rem; }
         .matrix-word-display { font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; text-align: center; color: #ff4b2b; margin: 20px 0; text-transform: uppercase; }
@@ -112,7 +114,7 @@
         .node-tile { aspect-ratio: 1; background: #111a2e; border: 2px solid #1f2d47; border-radius: 16px; cursor: pointer; }
         .node-tile.active-target { background: var(--grad-reflex); box-shadow: 0 0 15px #f5af19; border-color: #fff; }
 
-        /* RISK CONTROL RISK SYSTEM OVERLAY BLOCK */
+        /* BANK OR BUST RISKS RISK ENGINE MODAL */
         .risk-modal-box { background: #121c30; border: 2px solid #ff416c; padding: 20px; border-radius: 20px; text-align: center; margin: 15px 0; }
     </style>
 </head>
@@ -130,7 +132,7 @@
         
         <div class="brand-header">
             <h1 class="brand-title">SkillClash AI</h1>
-            <div class="nexus-badge"><div class="nexus-dot"></div><span>COMPETITIVE MAINNET SEED</span></div>
+            <div class="nexus-badge"><div class="nexus-dot"></div><span>CONNECTING TO MAINNET NETCORE...</span></div>
         </div>
 
         <div id="layer-lobby" class="screen-instance active-layer" style="gap: 12px;">
@@ -209,15 +211,15 @@
             <div class="game-runtime-header"><span>📅 Daily Arena Schedule</span></div>
             
             <div class="schedule-node-row live-now">
-                <div><strong>💻 TODAY: Tech & AI Arena</strong><br><small style="color:var(--neon-green)">Pool: 5,000 Pi Allocated</small></div>
-                <span class="badge-live-now" onclick="launchActiveSpotlightQuiz()">LAUNCH</span>
+                <div><strong>💻 TODAY: Tech & AI Arena</strong><br><small style="color:var(--neon-green)">Entry: 0.1 Pi Token Stake</small></div>
+                <span class="badge-live-now" onclick="launchActiveSpotlightQuiz()">STAKE & PLAY</span>
             </div>
             <div class="schedule-node-row">
                 <div><strong>⚽ TOMORROW: Global Sports</strong><br><small style="color:var(--text-muted)">Unlocks in 14h 32m</small></div>
                 <span class="badge-lock-day">LOCKED</span>
             </div>
             <div class="schedule-node-row">
-                <div><strong>🎬 THURSDAY: Pop Culture & Box Office</strong><br><small style="color:var(--text-muted)">Unlocks in 38h 12m</small></div>
+                <div><strong>🎬 THURSDAY: Pop Culture & Movies</strong><br><small style="color:var(--text-muted)">Unlocks in 38h 12m</small></div>
                 <span class="badge-lock-day">LOCKED</span>
             </div>
             
@@ -226,14 +228,14 @@
 
         <div id="layer-trivia-play" class="screen-instance">
             <div class="game-runtime-header"><span>Tech & AI Spotlight</span><span id="txt-trivia-multiplier">1.0x Mult</span></div>
-            <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;" id="txt-question-box">Parsing database element...</div>
+            <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;" id="txt-question-box">Parsing database stream...</div>
             <div class="option-stack" id="container-options-stack"></div>
         </div>
 
         <div id="layer-matrix-play" class="screen-instance">
-            <div class="game-runtime-header"><span>Puzzle Streak: <span id="matrix-streak-counter">0</span></span><span id="matrix-clock">30s</span></div>
+            <div class="game-runtime-header"><span>Streak Count: <span id="matrix-streak-counter">0</span></span><span id="matrix-clock">30s</span></div>
             <div class="matrix-word-display" id="txt-scrambled-string">------</div>
-            <input type="text" id="input-matrix-cleartext" class="matrix-text-entry" placeholder="Unscramble word string...">
+            <input type="text" id="input-matrix-cleartext" class="matrix-text-entry" placeholder="Unscramble string cache...">
             <button class="general-action-trigger" onclick="evaluateMatrixAttempt()">Submit String Verification</button>
         </div>
 
@@ -249,17 +251,17 @@
         <div id="layer-risk-console" class="screen-instance">
             <div class="risk-modal-box">
                 <h2 style="color:#ff416c; margin:0 0 10px 0; font-weight:900;">⚠️ BANK OR BUST</h2>
-                <p style="font-size:0.95rem; line-height:1.4; color:#a3b8cc;">You completed the phase loop! You are holding <strong style="color:#fff" id="txt-unsecured-pts">0</strong> unverified points.</p>
-                <p style="font-size:0.85rem; color:#ff416c;">If you continue to the next speed tier and miss, your record wipes out entirely.</p>
+                <p style="font-size:0.95rem; line-height:1.4; color:#a3b8cc;">You cleared the phase! You are holding <strong style="color:#fff" id="txt-unsecured-pts">0</strong> unverified score points.</p>
+                <p style="font-size:0.85rem; color:#ff416c;">If you advance to the next level velocity tier and miss, your current unsecured cache wipes completely.</p>
             </div>
             <button class="general-action-trigger" style="background:linear-gradient(180deg, #5dfd2d 0%, #17b302 100%); color:#000;" onclick="bankPointsSecurely()">💰 SECURE & BANK POINTS</button>
-            <button class="general-action-trigger" style="background:#ff416c;" onclick="riskItAllAndEscalate()">🔥 RISK IT ALL (ESCALATE DIFF)</button>
+            <button class="general-action-trigger" style="background:#ff416c;" onclick="riskItAllAndEscalate()">🔥 RISK IT ALL (ESCALATE COGNITION)</button>
         </div>
 
         <div id="layer-score-terminal" class="screen-instance" style="text-align:center;">
-            <div style="font-size: 1.6rem; font-weight:900; color:#ff0844;">BUSTED OUT</div>
-            <p style="color:var(--text-muted)">You pushed your luck too far and lost your unsecured points cache.</p>
-            <div style="font-size: 3rem; font-weight:900; margin: 20px 0; color:#fff;">0 PTS RECORDED</div>
+            <div style="font-size: 1.6rem; font-weight:900; color:#ff0844;">CACHE WIPED OUT</div>
+            <p style="color:var(--text-muted)">You pushed execution limits too far and lost unsecured points.</p>
+            <div style="font-size: 3rem; font-weight:900; margin: 20px 0; color:#fff;">0 PTS SAVED</div>
             <button class="general-action-trigger" onclick="exitToLobby()">Return To Core Lobby</button>
         </div>
 
@@ -269,125 +271,4 @@
         let runtimeScore = 0;
         let runningStreak = 0;
         let globalCountdown;
-        let queuedGameKey = '';
-        let targetWord = '';
-        let currentQuestionStep = 0;
-        let reflexVelocityTier = 1;
-
-        const manualDirectory = {
-            'trivia': "🏆 INSTRUCTION MANUAL: DAF SPOTLIGHT ARENA\n\nNiches are now locked behind a daily rotating spotlight calendar to maximize match liquidity.\n\nToday is TECH & AI. Each consecutive prompt answered adds +0.5x to your final scoring weight. Failing a question terminates your multiplier link instantly.",
-            'matrix': "🧩 INSTRUCTION MANUAL: MATRIX STRING\n\nDeconstruct randomized character groupings. Correct cleartext inputs stack onto an endless chain streak. Words get longer with every completion loop. A wrong answer breaks your run.",
-            'reflex': "⚡ INSTRUCTION MANUAL: ENDLESS RISK TAPS\n\nTiles illuminate at rapid speeds. Clear a round of 10 nodes to trigger the BANK OR BUST state.\n\nYou must choose whether to securely bank your accumulation score to leaderboards, or risk it for accelerated speed runs with higher multipliers!"
-        };
-
-        const activeTechQuestions = [
-            {q:"What engine component runs distributed smart contract logic on the 2026 updated Pi network?", o:["SQL Engine Layers","WebAssembly (WASM) Isolation","Python Kernels","Centralized API Gateways"], a:1},
-            {q:"What cryptography layer prevents tracing records backwards inside blocks?", o:["One-Way Hash Sequences","Symmetric Salts","Dynamic Zip Compressions","Local Partition Arrays"], a:0}
-        ];
-
-        const matrixLexicon = ["NODE", "BLOCK", "TOKEN", "KERNEL", "CIRCUIT", "VALIDATOR"];
-
-        function verifyTutorialRequirement(gameKey) {
-            queuedGameKey = gameKey;
-            if(!localStorage.getItem(`clash_v2_tutorial_${gameKey}`)) {
-                document.getElementById("modal-title").textContent = gameKey.toUpperCase() + " OPERATION SPEC";
-                document.getElementById("modal-text").innerText = manualDirectory[gameKey];
-                document.getElementById("instruction-overlay").style.display = "flex";
-                localStorage.setItem(`clash_v2_tutorial_${gameKey}`, "true");
-            } else {
-                dismissInstructionScreen();
-            }
-        }
-
-        function dismissInstructionScreen() {
-            document.getElementById("instruction-overlay").style.display = "none";
-            runningStreak = 0; runtimeScore = 0; reflexVelocityTier = 1;
-            if(queuedGameKey === 'trivia') changeViewLayer('layer-trivia-hub');
-            if(queuedGameKey === 'matrix') bootMatrixArena();
-            if(queuedGameKey === 'reflex') bootReflexArena();
-        }
-
-        function changeViewLayer(id) {
-            document.querySelectorAll('.screen-instance').forEach(s => s.classList.remove('active-layer'));
-            document.getElementById(id).classList.add('active-layer');
-        }
-
-        function launchActiveSpotlightQuiz() {
-            currentQuestionStep = 0; runningStreak = 1.0; runtimeScore = 0;
-            changeViewLayer('layer-trivia-play'); renderTriviaSequence();
-        }
-
-        function renderTriviaSequence() {
-            document.getElementById("txt-trivia-multiplier").textContent = `${runningStreak.toFixed(1)}x Mult`;
-            let node = activeTechQuestions[currentQuestionStep];
-            if(!node) { bankPointsSecurely(); return; }
-            
-            document.getElementById("txt-question-box").textContent = node.q;
-            let stack = document.getElementById("container-options-stack"); stack.innerHTML = "";
-            node.o.forEach((opt, idx) => {
-                let b = document.createElement("button"); b.className = "game-opt-btn"; b.textContent = opt;
-                b.onclick = () => {
-                    if(idx === node.a) { runtimeScore += Math.round(40 * runningStreak); runningStreak += 0.5; currentQuestionStep++; renderTriviaSequence(); }
-                    else { changeViewLayer('layer-score-terminal'); }
-                };
-                stack.appendChild(b);
-            });
-        }
-
-        function bootMatrixArena() { changeViewLayer('layer-matrix-play'); runMatrixStep(); }
-        function runMatrixStep() {
-            document.getElementById("matrix-streak-counter").textContent = runningStreak;
-            targetWord = matrixLexicon[Math.min(matrixLexicon.length - 1, Math.floor(runningStreak / 2))];
-            document.getElementById("txt-scrambled-string").textContent = targetWord.split('').sort(() => Math.random() - 0.5).join('');
-            
-            let timeAllocated = Math.max(10, 30 - runningStreak * 2);
-            let left = timeAllocated; document.getElementById("matrix-clock").textContent = `${left}s`;
-            clearInterval(globalCountdown);
-            globalCountdown = setInterval(() => {
-                left--; document.getElementById("matrix-clock").textContent = `${left}s`;
-                if(left <= 0) changeViewLayer('layer-score-terminal');
-            }, 1000);
-        }
-
-        function evaluateMatrixAttempt() {
-            if(document.getElementById("input-matrix-cleartext").value.trim().toUpperCase() === targetWord) {
-                runtimeScore += 50 * (1 + runningStreak * 0.2); runningStreak++;
-                document.getElementById("input-matrix-cleartext").value = ""; runMatrixStep();
-            } else { clearInterval(globalCountdown); changeViewLayer('layer-score-terminal'); }
-        }
-
-        let tileTimer, targetedTileIndex = -1, reflexTapsCount = 0;
-        function bootReflexArena() { changeViewLayer('layer-reflex-play'); reflexTapsCount = 0; fireReflexStep(); }
-        function fireReflexStep() {
-            document.getElementById("txt-reflex-speed").textContent = `${100 + (reflexVelocityTier - 1) * 30}%`;
-            document.getElementById("txt-reflex-pts").textContent = `Pending: ${runtimeScore} Pts`;
-            if(targetedTileIndex !== -1) document.getElementById(`tile-${targetedTileIndex}`).classList.remove('active-target');
-            
-            if(reflexTapsCount >= 10) {
-                document.getElementById("txt-unsecured-pts").textContent = runtimeScore;
-                changeViewLayer('layer-risk-console'); return;
-            }
-            
-            targetedTileIndex = Math.floor(Math.random() * 9);
-            document.getElementById(`tile-${targetedTileIndex}`).classList.add('active-target');
-            let baselineSpeed = Math.max(220, 750 - (reflexVelocityTier * 90));
-            clearTimeout(tileTimer); tileTimer = setTimeout(() => { changeViewLayer('layer-score-terminal'); }, baselineSpeed);
-        }
-
-        function registerTileTap(idx) {
-            if(idx === targetedTileIndex) {
-                runtimeScore += Math.round(15 * (1 + (reflexVelocityTier * 0.25))); reflexTapsCount++; fireReflexStep();
-            } else { clearTimeout(tileTimer); changeViewLayer('layer-score-terminal'); }
-        }
-
-        function riskItAllAndEscalate() { reflexVelocityTier++; reflexTapsCount = 0; changeViewLayer('layer-reflex-play'); fireReflexStep(); }
-        
-        function bankPointsSecurely() {
-            alert(`DATA LINK SYNC: Securing ${runtimeScore} points to database cache registries.`);
-            exitToLobby();
-        }
-
-        function exitToLobby() { clearInterval(globalCountdown); clearTimeout(tileTimer); changeViewLayer('layer-lobby'); }
-    </script>
-</body>
-</html>
+        let queued
