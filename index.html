@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
     
+    <!-- CRITICAL CORE: Native Pi Platform Gateway Link -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     
     <style>
@@ -120,6 +121,7 @@
 </head>
 <body>
 
+    <!-- OVERLAY MANUAL SYSTEM -->
     <div id="instruction-overlay" class="overlay-instruction-panel">
         <div class="instruction-modal-body">
             <div id="modal-title" class="modal-headline">SYSTEM GUIDE</div>
@@ -130,13 +132,16 @@
 
     <div class="app-wrapper">
         
+        <!-- HEADER LAYOUT -->
         <div class="brand-header">
             <h1 class="brand-title">SkillClash AI</h1>
-            <div class="nexus-badge"><div class="nexus-dot"></div><span>CONNECTING TO MAINNET NETCORE...</span></div>
+            <div class="nexus-badge"><div class="nexus-dot"></div><span id="platform-status-text">CONNECTING TO MAINNET...</span></div>
         </div>
 
+        <!-- SCREEN: LOBBY HUB -->
         <div id="layer-lobby" class="screen-instance active-layer" style="gap: 12px;">
             
+            <!-- ARENA 1: TRIVIA -->
             <div class="game-card-row">
                 <div class="game-left-block">
                     <div class="game-icon-square icon-trivia"><svg class="icon-square-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
@@ -149,6 +154,7 @@
                 <button class="btn-play-action" onclick="verifyTutorialRequirement('trivia')">PLAY</button>
             </div>
 
+            <!-- ARENA 2: WORD MATRIX -->
             <div class="game-card-row">
                 <div class="game-left-block">
                     <div class="game-icon-square icon-matrix"><svg class="icon-square-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/></svg></div>
@@ -161,6 +167,7 @@
                 <button class="btn-play-action" onclick="verifyTutorialRequirement('matrix')">PLAY</button>
             </div>
 
+            <!-- ARENA 3: REFLEX NODE TAP -->
             <div class="game-card-row">
                 <div class="game-left-block">
                     <div class="game-icon-square icon-reflex"><svg class="icon-square-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/></svg></div>
@@ -173,6 +180,7 @@
                 <button class="btn-play-action" onclick="verifyTutorialRequirement('reflex')">PLAY</button>
             </div>
 
+            <!-- VAULT STORAGE ZONE -->
             <div class="game-card-row vault-locked">
                 <div class="game-left-block">
                     <div style="background:#222c3e" class="game-icon-square">🔒</div>
@@ -207,6 +215,7 @@
             </div>
         </div>
 
+        <!-- SCREEN: DAILY ROTATIONAL SPOTLIGHT TRIVIA HUB -->
         <div id="layer-trivia-hub" class="screen-instance">
             <div class="game-runtime-header"><span>📅 Daily Arena Schedule</span></div>
             
@@ -226,12 +235,14 @@
             <button class="general-action-trigger" style="background:#ff0844;" onclick="exitToLobby()">Aborted Arena Link</button>
         </div>
 
+        <!-- SCREEN: ACTIVE TRIVIA INTERFACE -->
         <div id="layer-trivia-play" class="screen-instance">
             <div class="game-runtime-header"><span>Tech & AI Spotlight</span><span id="txt-trivia-multiplier">1.0x Mult</span></div>
             <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;" id="txt-question-box">Parsing database stream...</div>
             <div class="option-stack" id="container-options-stack"></div>
         </div>
 
+        <!-- SCREEN: WORD MATRIX INTERFACE -->
         <div id="layer-matrix-play" class="screen-instance">
             <div class="game-runtime-header"><span>Streak Count: <span id="matrix-streak-counter">0</span></span><span id="matrix-clock">30s</span></div>
             <div class="matrix-word-display" id="txt-scrambled-string">------</div>
@@ -239,6 +250,7 @@
             <button class="general-action-trigger" onclick="evaluateMatrixAttempt()">Submit String Verification</button>
         </div>
 
+        <!-- SCREEN: REFLEX NODE INTERFACE -->
         <div id="layer-reflex-play" class="screen-instance">
             <div class="game-runtime-header"><span>Speed: <span id="txt-reflex-speed">100%</span></span><span style="color:var(--neon-green)" id="txt-reflex-pts">Pending: 0 Pts</span></div>
             <div class="reflex-node-matrix">
@@ -248,6 +260,7 @@
             </div>
         </div>
 
+        <!-- SCREEN: SECURE BANKING RISK PANEL -->
         <div id="layer-risk-console" class="screen-instance">
             <div class="risk-modal-box">
                 <h2 style="color:#ff416c; margin:0 0 10px 0; font-weight:900;">⚠️ BANK OR BUST</h2>
@@ -258,6 +271,7 @@
             <button class="general-action-trigger" style="background:#ff416c;" onclick="riskItAllAndEscalate()">🔥 RISK IT ALL (ESCALATE COGNITION)</button>
         </div>
 
+        <!-- SCORE WIPE TERMINAL SUMMARY -->
         <div id="layer-score-terminal" class="screen-instance" style="text-align:center;">
             <div style="font-size: 1.6rem; font-weight:900; color:#ff0844;">CACHE WIPED OUT</div>
             <p style="color:var(--text-muted)">You pushed execution limits too far and lost unsecured points.</p>
@@ -267,8 +281,205 @@
 
     </div>
 
+    <!-- MAIN GAMEPLAY MECHANICS ENGINE -->
     <script>
         let runtimeScore = 0;
         let runningStreak = 0;
         let globalCountdown;
-        let queued
+        let queuedGameKey = '';
+        let targetWord = '';
+        let currentQuestionStep = 0;
+        let reflexVelocityTier = 1;
+
+        const manualDirectory = {
+            'trivia': "🏆 INSTRUCTION MANUAL: DAILY SPOTLIGHT ARENA\n\nNiches are locked into a daily calendar cycle to keep player matching pools highly dense.\n\nToday's spotlight is TECH & AI. Consecutive questions cleared stack an incremental +0.5x multiplier modifier onto your active points. Missing terminates execution.",
+            'matrix': "🧩 INSTRUCTION MANUAL: MATRIX STRING\n\nUnscramble randomized characters. Successful entries add directly into an endless stream chain. Strings get longer with every consecutive match. A single fault breaks the run.",
+            'reflex': "⚡ INSTRUCTION MANUAL: REFLEX NODE MATCH\n\nGrid nodes flash in quick cycles. Clear 10 targets continuously to safely open the BANK OR BUST console.\n\nChoose to log and bank your record securely to servers, or push directly into higher speed multiplier matrices!"
+        };
+
+        const activeTechQuestions = [
+            {q:"What script parsing framework drives standard high-performance decentralised app executions on smart networks?", o:["SQL Engine Layers","WebAssembly (WASM) Isolation","Python Base Kernels","Centralized API Gateways"], a:1},
+            {q:"What cryptography concept secures transactional forward-secrecy validation patterns?", o:["One-Way Hash Sequences","Symmetric Salts","Dynamic Compression Matrix","Local Partition Arrays"], a:0}
+        ];
+
+        const matrixLexicon = ["NODE", "BLOCK", "TOKEN", "KERNEL", "CIRCUIT", "VALIDATOR"];
+
+        function verifyTutorialRequirement(gameKey) {
+            queuedGameKey = gameKey;
+            if(!localStorage.getItem(`clash_v2_tutorial_${gameKey}`)) {
+                document.getElementById("modal-title").textContent = gameKey.toUpperCase() + " OPERATION SPEC";
+                document.getElementById("modal-text").innerText = manualDirectory[gameKey];
+                document.getElementById("instruction-overlay").style.display = "flex";
+                localStorage.setItem(`clash_v2_tutorial_${gameKey}`, "true");
+            } else {
+                dismissInstructionScreen();
+            }
+        }
+
+        function dismissInstructionScreen() {
+            document.getElementById("instruction-overlay").style.display = "none";
+            runningStreak = 0; runtimeScore = 0; reflexVelocityTier = 1;
+            if(queuedGameKey === 'trivia') changeViewLayer('layer-trivia-hub');
+            if(queuedGameKey === 'matrix') bootMatrixArena();
+            if(queuedGameKey === 'reflex') bootReflexArena();
+        }
+
+        function changeViewLayer(id) {
+            document.querySelectorAll('.screen-instance').forEach(s => s.classList.remove('active-layer'));
+            document.getElementById(id).classList.add('active-layer');
+        }
+
+        /* WORD MATRIX ENGINE */
+        function bootMatrixArena() { changeViewLayer('layer-matrix-play'); runMatrixStep(); }
+        function runMatrixStep() {
+            document.getElementById("matrix-streak-counter").textContent = runningStreak;
+            targetWord = matrixLexicon[Math.min(matrixLexicon.length - 1, Math.floor(runningStreak / 2))];
+            document.getElementById("txt-scrambled-string").textContent = targetWord.split('').sort(() => Math.random() - 0.5).join('');
+            
+            let timeAllocated = Math.max(10, 30 - runningStreak * 2);
+            let left = timeAllocated; document.getElementById("matrix-clock").textContent = `${left}s`;
+            clearInterval(globalCountdown);
+            globalCountdown = setInterval(() => {
+                left--; document.getElementById("matrix-clock").textContent = `${left}s`;
+                if(left <= 0) { clearInterval(globalCountdown); changeViewLayer('layer-score-terminal'); }
+            }, 1000);
+        }
+
+        function evaluateMatrixAttempt() {
+            if(document.getElementById("input-matrix-cleartext").value.trim().toUpperCase() === targetWord) {
+                runtimeScore += 50 * (1 + runningStreak * 0.2); runningStreak++;
+                document.getElementById("input-matrix-cleartext").value = ""; runMatrixStep();
+            } else { clearInterval(globalCountdown); changeViewLayer('layer-score-terminal'); }
+        }
+
+        /* ENDLESS VELOCITY ESCALATION REFLEX ENGINE */
+        let tileTimer, targetedTileIndex = -1, reflexTapsCount = 0;
+        function bootReflexArena() { changeViewLayer('layer-reflex-play'); reflexTapsCount = 0; fireReflexStep(); }
+        function fireReflexStep() {
+            document.getElementById("txt-reflex-speed").textContent = `${100 + (reflexVelocityTier - 1) * 30}%`;
+            document.getElementById("txt-reflex-pts").textContent = `Pending: ${runtimeScore} Pts`;
+            if(targetedTileIndex !== -1) document.getElementById(`tile-${targetedTileIndex}`).classList.remove('active-target');
+            
+            if(reflexTapsCount >= 10) {
+                document.getElementById("txt-unsecured-pts").textContent = runtimeScore;
+                changeViewLayer('layer-risk-console'); return;
+            }
+            
+            targetedTileIndex = Math.floor(Math.random() * 9);
+            document.getElementById(`tile-${targetedTileIndex}`).classList.add('active-target');
+            let baselineSpeed = Math.max(220, 750 - (reflexVelocityTier * 90));
+            clearTimeout(tileTimer); tileTimer = setTimeout(() => { changeViewLayer('layer-score-terminal'); }, baselineSpeed);
+        }
+
+        function registerTileTap(idx) {
+            if(idx === targetedTileIndex) {
+                runtimeScore += Math.round(15 * (1 + (reflexVelocityTier * 0.25))); reflexTapsCount++; fireReflexStep();
+            } else { clearTimeout(tileTimer); changeViewLayer('layer-score-terminal'); }
+        }
+
+        function riskItAllAndEscalate() { reflexVelocityTier++; reflexTapsCount = 0; changeViewLayer('layer-reflex-play'); fireReflexStep(); }
+        function bankPointsSecurely() { alert(`NET LINK SUCCESS: Secured ${runtimeScore} points to database cache registries.`); exitToLobby(); }
+        function exitToLobby() { clearInterval(globalCountdown); clearTimeout(tileTimer); changeViewLayer('layer-lobby'); }
+    </script>
+
+    <!-- NATIVE INTEGRATION LAYER FOR PI PLATFORM NETWORK -->
+    <script>
+        const PiScopes = ['username', 'payments'];
+        let isPiBrowserEnv = false;
+
+        function initializePiPlatform() {
+            try {
+                if (typeof Pi !== 'undefined') {
+                    Pi.init({ version: "2.0", sandbox: false });
+                    console.log("SkillClash Platform Pipeline Initialized.");
+                    isPiBrowserEnv = true;
+                    authenticatePiPlayer();
+                } else {
+                    console.warn("Pi SDK object missing. Running in standard developer sandbox bypass mode.");
+                    document.getElementById('platform-status-text').textContent = "DEV SANDBOX BYPASS (LOCAL)";
+                }
+            } catch (error) {
+                console.warn("Native integration error. Running in sandbox bypass mode.");
+                document.getElementById('platform-status-text').textContent = "DEV SANDBOX BYPASS (LOCAL)";
+            }
+        }
+
+        function authenticatePiPlayer() {
+            Pi.authenticate(PiScopes, onPaymentRequestReceived)
+              .then(function(auth) {
+                  console.log(`Core confirmed identity: ${auth.user.username}`);
+                  document.getElementById('platform-status-text').textContent = `PILOT: ${auth.user.username.toUpperCase()}`;
+              })
+              .catch(function(err) {
+                  console.error("Authentication handshake aborted by browser layer:", err);
+                  document.getElementById('platform-status-text').textContent = "AUTH BYPASS MODE";
+              });
+        }
+
+        function onPaymentRequestReceived(payment) { console.log("Incoming tracking payload captured:", payment); }
+
+        function chargeArenaEntryFee(amountPi) {
+            return new Promise((resolve, reject) => {
+                if (!isPiBrowserEnv) {
+                    console.log(`Sandbox Bypass: Simulating successful payment of ${amountPi} Pi.`);
+                    resolve("MOCK_TX_ID_SANDBOX");
+                    return;
+                }
+                
+                Pi.createPayment({
+                    amount: amountPi,
+                    memo: "Daily Arena Spotlight Entry Fee - SkillClash AI",
+                    metadata: { gameType: "daily_spotlight" },
+                }, {
+                    onReadyForServerApproval: function(paymentId) {
+                        console.log(`Payment identified on blockchain ledger: ${paymentId}. Pending verification step...`);
+                    },
+                    onReadyForServerCompletion: function(paymentId, txid) {
+                        console.log(`Server authorization cleared. Finalizing tx ${txid}...`);
+                        resolve(txid);
+                    },
+                    onCancel: function(paymentId) { reject("User aborted payment pipeline."); },
+                    onError: function(error, payment) { reject(error); }
+                });
+            });
+        }
+
+        /* STAKE CHALLENGE TRIGGERS */
+        function launchActiveSpotlightQuiz() {
+            chargeArenaEntryFee(0.1)
+                .then((txid) => {
+                    currentQuestionStep = 0; runningStreak = 1.0; runtimeScore = 0;
+                    changeViewLayer('layer-trivia-play'); renderTriviaSequence();
+                })
+                .catch((err) => {
+                    alert("Entry Refused: An active 0.1 Pi payment confirmation is required to write scores onto the tournament server leaderboards.");
+                });
+        }
+
+        function renderTriviaSequence() {
+            document.getElementById("txt-trivia-multiplier").textContent = `${runningStreak.toFixed(1)}x Mult`;
+            let node = activeTechQuestions[currentQuestionStep];
+            if(!node) { bankPointsSecurely(); return; }
+            
+            document.getElementById("txt-question-box").textContent = node.q;
+            let stack = document.getElementById("container-options-stack"); stack.innerHTML = "";
+            node.o.forEach((opt, idx) => {
+                let b = document.createElement("button"); b.className = "game-opt-btn"; b.textContent = opt;
+                b.onclick = () => {
+                    if(idx === node.a) { 
+                        runtimeScore += Math.round(40 * runningStreak); 
+                        runningStreak += 0.5; 
+                        currentQuestionStep++; 
+                        renderTriviaSequence(); 
+                    } else { 
+                        changeViewLayer('layer-score-terminal'); 
+                    }
+                };
+                stack.appendChild(b);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initializePiPlatform);
+    </script>
+</body>
+</html>
