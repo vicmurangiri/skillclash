@@ -1,57 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillClash AI Arena</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <style>
-        body { background-color: #050914; color: white; font-family: sans-serif; padding: 20px; }
-        .game-card { background: #0c1322; padding: 20px; border-radius: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        button { background: #39ff14; padding: 10px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    </style>
 </head>
 <body>
-    <h1 id="status">INITIALIZING...</h1>
-    <div class="game-card">
-        <div><h3>AI Trivia Arena</h3><p>Entry: 0.1 Pi</p></div>
-        <button onclick="triggerPayment()">PLAY</button>
-    </div>
+    <h1 id="status">CONNECTING...</h1>
+    <button onclick="pay()">PLAY TRIVIA</button>
 
     <script>
-        let piReady = false;
-
-        window.addEventListener("DOMContentLoaded", () => {
-            if (typeof Pi !== 'undefined') {
-                Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
-                Pi.authenticate(['username', 'payments'], (auth) => {
-                    document.getElementById('status').textContent = "PILOT: " + auth.user.username;
-                    piReady = true;
-                }).catch((err) => {
-                    document.getElementById('status').textContent = "AUTH ERROR: " + err;
-                });
-            } else {
-                document.getElementById('status').textContent = "SDK NOT FOUND";
-            }
+        // Force immediate init
+        Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
+        
+        Pi.authenticate(['username', 'payments'], (auth) => {
+            document.getElementById('status').textContent = "PILOT: " + auth.user.username;
+        }).catch((err) => {
+            document.getElementById('status').textContent = "AUTH FAILED: " + err;
         });
 
-        function triggerPayment() {
-            if (!piReady) {
-                alert("System still connecting to Pi Network. Please wait.");
-                return;
-            }
-            console.log("Payment initiated");
+        function pay() {
             Pi.createPayment({
                 amount: 0.1,
                 memo: "SkillClash AI Entry",
                 metadata: { gameType: "trivia" }
             }, {
-                onReadyForServerCompletion: (pid, txid) => alert("Success! TX: " + txid),
+                onReadyForServerCompletion: (pid, txid) => alert("Success: " + txid),
                 onCancel: () => alert("Cancelled"),
-                onError: (err) => alert("Payment Error: " + err)
+                onError: (err) => alert("Error: " + err)
             });
         }
     </script>
 </body>
 </html>
-
