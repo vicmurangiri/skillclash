@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,41 +14,118 @@
             --bg-dark: #050914;
             --card-bg: #0c1322;
             --neon-green: #39ff14;
+            --neon-blue: #00d2ff;
             --text-main: #ffffff;
             --text-muted: #7e8fa9;
-            --play-counter: #00d2ff;
-            --locked-grey: #2a364d;
+            --locked-grey: #162238;
         }
 
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
-            margin: 0; padding: 16px;
-            display: flex; flex-direction: column; align-items: center;
+            margin: 0; 
+            padding: 16px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
             min-height: 100vh;
         }
 
-        .app-wrapper { max-width: 440px; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+        .app-wrapper { 
+            max-width: 440px; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
         .brand-title {
-            font-size: 2rem; font-weight: 900; text-align: center; text-transform: uppercase;
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            margin: 0;
+            text-transform: uppercase;
             background: linear-gradient(90deg, #fff, var(--neon-green));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        #platform-status-text {
+            font-size: 0.75rem; 
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-top: 4px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 8px 0 4px 4px;
         }
 
         .game-card-row {
-            background-color: var(--card-bg); border-radius: 20px; padding: 16px;
-            display: flex; align-items: center; justify-content: space-between;
-            border: 1px solid rgba(57, 255, 20, 0.2);
+            background-color: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 18px;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            border: 1px solid rgba(57, 255, 20, 0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .game-card-row:active {
+            transform: scale(0.98);
+        }
+
+        .game-info h3 {
+            margin: 0 0 4px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .game-info p {
+            margin: 0;
+            font-size: 0.8rem; 
+            color: var(--text-muted);
         }
 
         .btn-play-action {
             background: linear-gradient(180deg, #5dfd2d 0%, #17b302 100%);
-            color: #03060d; font-weight: 900; padding: 10px 20px; border-radius: 12px; cursor: pointer;
+            color: #03060d; 
+            font-weight: 900; 
+            padding: 12px 24px; 
+            border-radius: 14px; 
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(57, 255, 20, 0.2);
         }
 
-        .screen-instance { display: none; }
-        .screen-instance.active-layer { display: flex; flex-direction: column; }
+        /* Styling for alternative/upcoming games */
+        .card-locked {
+            background-color: var(--locked-grey);
+            border: 1px solid rgba(0, 210, 255, 0.1);
+        }
+
+        .btn-secondary-action {
+            background: linear-gradient(180deg, #00e5ff 0%, #008ca3 100%);
+            color: #03060d;
+            font-weight: 900; 
+            padding: 12px 24px; 
+            border-radius: 14px; 
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -55,61 +133,76 @@
     <div class="app-wrapper">
         <div class="brand-header">
             <h1 class="brand-title">SkillClash AI</h1>
-            <div id="platform-status-text" style="text-align:center; font-size: 0.7rem; color: var(--neon-green);">INITIALIZING...</div>
+            <div id="platform-status-text">INITIALIZING SYSTEMS...</div>
         </div>
 
-        <div id="layer-lobby" class="screen-instance active-layer">
+        <div class="section-label">Active Arenas</div>
+
+        <!-- GAME MULTIPLEX LAYER -->
+        <div id="layer-lobby" style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <!-- GAME 1: AI TRIVIA -->
             <div class="game-card-row">
-                <div>
+                <div class="game-info">
                     <h3>AI Trivia Arena</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Entry: 0.1 Pi Testnet Stake</p>
+                    <p>Entry: 0.1 Pi Testnet Stake</p>
                 </div>
                 <button class="btn-play-action" onclick="launchActiveSpotlightQuiz()">PLAY</button>
             </div>
+
+            <!-- GAME 2: REFLEX CHALLENGE -->
+            <div class="game-card-row card-locked">
+                <div class="game-info">
+                    <h3>Reflex Speed Clash</h3>
+                    <p style="color: var(--neon-blue);">Mode: Coming Soon</p>
+                </div>
+                <button class="btn-secondary-action" onclick="alert('Reflex Arena is currently compiling. Sharpness modules loading soon!')">PREVIEW</button>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // OFFICIAL PI INTEGRATION
-        function initializePiPlatform() {
-            try {
-                if (typeof Pi !== 'undefined') {
-                    // Initialized with your specific App ID
-                    Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
-                    console.log("SkillClash Platform Pipeline Initialized.");
-                    authenticatePiPlayer();
-                } else {
-                    document.getElementById('platform-status-text').textContent = "SDK NOT DETECTED";
-                }
-            } catch (error) {
-                console.error("Initialization error:", error);
+        // Synchronized initialization matrix
+        window.addEventListener("DOMContentLoaded", () => {
+            if (typeof Pi !== 'undefined') {
+                // Initialize using your unique Testnet App ID
+                Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
+                console.log("Pi SDK Core Connected.");
+                
+                // Immediately request secure handshake
+                Pi.authenticate(['username', 'payments'], function(auth) {
+                    document.getElementById('platform-status-text').textContent = `PILOT: ${auth.user.username.toUpperCase()}`;
+                    document.getElementById('platform-status-text').style.color = "#39ff14";
+                }).catch(function(err) {
+                    console.error("Handshake aborted:", err);
+                    document.getElementById('platform-status-text').textContent = "AUTHENTICATION ERROR";
+                    document.getElementById('platform-status-text').style.color = "#ff3333";
+                });
+            } else {
+                document.getElementById('platform-status-text').textContent = "SDK LIFTOFF FAILURE (NOT IN PI BROWSER)";
+                document.getElementById('platform-status-text').style.color = "#ff3333";
             }
-        }
+        });
 
-        function authenticatePiPlayer() {
-            Pi.authenticate(['username', 'payments'], function(auth) {
-                document.getElementById('platform-status-text').textContent = `PILOT: ${auth.user.username.toUpperCase()}`;
-            }).catch(function(err) {
-                console.error("Auth aborted", err);
-            });
-        }
-
+        // Testnet payment module logic
         function launchActiveSpotlightQuiz() {
-            // Payment logic specifically for Testnet
             Pi.createPayment({
                 amount: 0.1,
-                memo: "SkillClash AI Entry",
-                metadata: { gameType: "trivia" },
+                memo: "SkillClash AI Entry Stake",
+                metadata: { gameType: "trivia_arena_v1" },
             }, {
                 onReadyForServerCompletion: function(paymentId, txid) {
-                    alert("Payment Success! TX: " + txid);
+                    alert("Transaction broadcasted successfully! TXID: " + txid);
                 },
-                onCancel: function() { alert("Payment cancelled."); },
-                onError: function(err) { alert("Error: " + err); }
+                onCancel: function() { 
+                    alert("Transaction canceled by player."); 
+                },
+                onError: function(err) { 
+                    alert("Gateway Error: " + err); 
+                }
             });
         }
-
-        window.addEventListener('DOMContentLoaded', initializePiPlatform);
     </script>
 </body>
 </html>
