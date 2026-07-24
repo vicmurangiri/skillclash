@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js?v=99"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=100"></script>
 </head>
 <body>
     <h1 id="status">CONNECTING TO PI...</h1>
-    <button onclick="launchNewPaymentSystem()" id="playBtn" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer;">PLAY TRIVIA (0.1 Pi)</button>
+    <button onclick="triggerPiPayment()" id="playBtn" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer;">PLAY TRIVIA (0.1 Pi)</button>
 
     <script>
         let sdkTimer = setTimeout(() => {
@@ -36,30 +36,37 @@
             document.getElementById('playBtn').style.display = "block";
         }
 
-        function launchNewPaymentSystem() {
-            try {
-                const callbacks = {
-                    onReadyForServerCompletion: function(paymentId, txid) {
-                        alert("Payment Ready! TXID: " + txid);
-                    },
-                    onCancel: function(paymentId) {
-                        alert("Payment cancelled.");
-                    },
-                    onError: function(error, payment) {
-                        alert("Payment error: " + (error ? error.message : "Unknown error"));
-                    },
-                    onIncompletePaymentFound: function(payment) {
-                        alert("Incomplete payment found.");
-                    }
-                };
+        function triggerPiPayment() {
+            if (typeof Pi === 'undefined' || !Pi.createPayment) {
+                alert("Pi SDK not fully loaded yet.");
+                return;
+            }
 
-                Pi.createPayment({
-                    amount: 0.1,
-                    memo: "SkillClash AI Entry",
-                    metadata: { gameType: "trivia" }
-                }, callbacks);
-            } catch(e) {
-                alert("Trigger exception: " + e.message);
+            const paymentData = {
+                amount: 0.1,
+                memo: "SkillClash AI Entry",
+                metadata: { gameType: "trivia" }
+            };
+
+            const callbacks = {
+                onReadyForServerCompletion: function(paymentId, txid) {
+                    alert("Ready for server completion. TXID: " + txid);
+                },
+                onCancel: function(paymentId) {
+                    alert("Payment cancelled.");
+                },
+                onError: function(error, payment) {
+                    alert("Payment error occurred.");
+                },
+                onIncompletePaymentFound: function(payment) {
+                    alert("Incomplete payment found.");
+                }
+            };
+
+            try {
+                Pi.createPayment(paymentData, callbacks);
+            } catch (err) {
+                alert("Creation caught: " + err);
             }
         }
     </script>
