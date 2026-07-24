@@ -1,32 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillClash AI Arena</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
-    <h1 id="status">CONNECTING...</h1>
-    <button onclick="pay()">PLAY TRIVIA</button>
+    <h1 id="status">CONNECTING TO PI...</h1>
+    <button onclick="pay()" id="playBtn" style="display:none;">PLAY TRIVIA (0.1 Pi)</button>
 
     <script>
-        // Force immediate init
-        Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
-        
-        Pi.authenticate(['username', 'payments'], (auth) => {
-            document.getElementById('status').textContent = "PILOT: " + auth.user.username;
-        }).catch((err) => {
-            document.getElementById('status').textContent = "AUTH FAILED: " + err;
-        });
+        // Safeguard timer: if Pi SDK doesn't load in 3 seconds, show an override
+        let sdkTimer = setTimeout(() => {
+            if(document.getElementById('status').innerText.includes("CONNECTING")) {
+                document.getElementById('status').innerText = "SDK TIMEOUT - CHECK SANDBOX/TESTNET";
+                document.getElementById('playBtn').style.display = "block";
+            }
+        }, 3000);
+
+        try {
+            Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
+            
+            Pi.authenticate(['username', 'payments'], (auth) => {
+                clearTimeout(sdkTimer);
+                document.getElementById('status').textContent = "PILOT: " + auth.user.username;
+                document.getElementById('playBtn').style.display = "block";
+            }).catch((err) => {
+                clearTimeout(sdkTimer);
+                document.getElementById('status').textContent = "AUTH ERROR: " + err;
+                document.getElementById('playBtn').style.display = "block";
+            });
+        } catch (e) {
+            clearTimeout(sdkTimer);
+            document.getElementById('status').textContent = "INIT ERROR: " + e;
+            document.getElementById('playBtn').style.display = "block";
+        }
 
         function pay() {
-            Pi.createPayment({
-                amount: 0.1,
-                memo: "SkillClash AI Entry",
-                metadata: { gameType: "trivia" }
-            }, {
-                onReadyForServerCompletion: (pid, txid) => alert("Success: " + txid),
-                onCancel: () => alert("Cancelled"),
-                onError: (err) => alert("Error: " + err)
-            });
+            try {
+                Pi.createPayment({
+                    amount: 0.1,
+                    memo: "SkillClash AI Entry",
+                    metadata: { gameType: "trivia" }
+                }, {
+                    onReadyForServerCompletion: (pid, txid) => alert("Success! TXID: " + txid),
+                    onCancel: () => alert("Payment cancelled"),
+                    onError: (err) => alert("Payment error: " + JSON.stringify(err))
+                });
+            } catch(e) {
+                alert("Payment trigger failed: " + e);
+            }
         }
     </script>
 </body>
