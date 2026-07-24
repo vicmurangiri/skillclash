@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js?v=100"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=101"></script>
 </head>
 <body>
     <h1 id="status">CONNECTING TO PI...</h1>
@@ -42,31 +42,27 @@
                 return;
             }
 
-            const paymentData = {
-                amount: 0.1,
-                memo: "SkillClash AI Entry",
-                metadata: { gameType: "trivia" }
-            };
-
-            const callbacks = {
-                onReadyForServerCompletion: function(paymentId, txid) {
-                    alert("Ready for server completion. TXID: " + txid);
-                },
-                onCancel: function(paymentId) {
-                    alert("Payment cancelled.");
-                },
-                onError: function(error, payment) {
-                    alert("Payment error occurred.");
-                },
-                onIncompletePaymentFound: function(payment) {
-                    alert("Incomplete payment found.");
-                }
-            };
-
             try {
-                Pi.createPayment(paymentData, callbacks);
+                Pi.createPayment({
+                    amount: 0.1,
+                    memo: "SkillClash AI Entry",
+                    metadata: { gameType: "trivia" }
+                }, {
+                    onReadyForServerCompletion: function(paymentId, txid) {
+                        alert("Ready for server completion. TXID: " + txid);
+                    },
+                    onCancel: function(paymentId) {
+                        alert("Payment cancelled.");
+                    },
+                    onError: function(error, payment) {
+                        alert("Payment error occurred.");
+                    },
+                    onIncompletePaymentFound: function(payment) {
+                        alert("Incomplete payment found.");
+                    }
+                });
             } catch (err) {
-                alert("Creation caught: " + err);
+                alert("Creation caught: " + err.message);
             }
         }
     </script>
