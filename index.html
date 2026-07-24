@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=3"></script>
 </head>
 <body>
     <h1 id="status">CONNECTING TO PI...</h1>
-    <button onclick="pay()" id="playBtn" style="display:none;">PLAY TRIVIA (0.1 Pi)</button>
+    <button onclick="pay()" id="playBtn" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer;">PLAY TRIVIA (0.1 Pi)</button>
 
     <script>
+        // Safeguard fallback if SDK handshake takes too long
         let sdkTimer = setTimeout(() => {
             if(document.getElementById('status').innerText.includes("CONNECTING")) {
                 document.getElementById('status').innerText = "READY (SANDBOX MODE)";
                 document.getElementById('playBtn').style.display = "block";
             }
-        }, 2000);
+        }, 3000);
 
         try {
             Pi.init({ version: "2.0", sandbox: true });
