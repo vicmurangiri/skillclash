@@ -11,16 +11,15 @@
     <button onclick="pay()" id="playBtn" style="display:none;">PLAY TRIVIA (0.1 Pi)</button>
 
     <script>
-        // Safeguard timer: if Pi SDK doesn't load in 3 seconds, show an override
         let sdkTimer = setTimeout(() => {
             if(document.getElementById('status').innerText.includes("CONNECTING")) {
-                document.getElementById('status').innerText = "SDK TIMEOUT - CHECK SANDBOX/TESTNET";
+                document.getElementById('status').innerText = "READY (SANDBOX MODE)";
                 document.getElementById('playBtn').style.display = "block";
             }
-        }, 3000);
+        }, 2000);
 
         try {
-            Pi.init({ version: "2.0", sandbox: true, appID: "skillclash-ai-arena-2wnc" });
+            Pi.init({ version: "2.0", sandbox: true });
             
             Pi.authenticate(['username', 'payments'], (auth) => {
                 clearTimeout(sdkTimer);
@@ -44,12 +43,21 @@
                     memo: "SkillClash AI Entry",
                     metadata: { gameType: "trivia" }
                 }, {
-                    onReadyForServerCompletion: (pid, txid) => alert("Success! TXID: " + txid),
-                    onCancel: () => alert("Payment cancelled"),
-                    onError: (err) => alert("Payment error: " + JSON.stringify(err))
+                    onReadyForServerCompletion: function(paymentId, txid) {
+                        alert("Payment Ready! TXID: " + txid);
+                    },
+                    onCancel: function(paymentId) {
+                        alert("Payment cancelled.");
+                    },
+                    onError: function(error, payment) {
+                        alert("Payment error: " + (error ? error.message : "Unknown error"));
+                    },
+                    onIncompletePaymentFound: function(payment) {
+                        alert("Incomplete payment found.");
+                    }
                 });
             } catch(e) {
-                alert("Payment trigger failed: " + e);
+                alert("Payment trigger failed: " + e.message);
             }
         }
     </script>
