@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js?v=3"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=99"></script>
 </head>
 <body>
     <h1 id="status">CONNECTING TO PI...</h1>
-    <button onclick="pay()" id="playBtn" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer;">PLAY TRIVIA (0.1 Pi)</button>
+    <button onclick="launchNewPaymentSystem()" id="playBtn" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer;">PLAY TRIVIA (0.1 Pi)</button>
 
     <script>
-        // Safeguard fallback if SDK handshake takes too long
         let sdkTimer = setTimeout(() => {
             if(document.getElementById('status').innerText.includes("CONNECTING")) {
                 document.getElementById('status').innerText = "READY (SANDBOX MODE)";
@@ -22,11 +21,11 @@
         try {
             Pi.init({ version: "2.0", sandbox: true });
             
-            Pi.authenticate(['username', 'payments'], (auth) => {
+            Pi.authenticate(['username', 'payments'], function(auth) {
                 clearTimeout(sdkTimer);
                 document.getElementById('status').textContent = "PILOT: " + auth.user.username;
                 document.getElementById('playBtn').style.display = "block";
-            }).catch((err) => {
+            }, function(err) {
                 clearTimeout(sdkTimer);
                 document.getElementById('status').textContent = "AUTH ERROR: " + err;
                 document.getElementById('playBtn').style.display = "block";
@@ -37,13 +36,9 @@
             document.getElementById('playBtn').style.display = "block";
         }
 
-        function pay() {
+        function launchNewPaymentSystem() {
             try {
-                Pi.createPayment({
-                    amount: 0.1,
-                    memo: "SkillClash AI Entry",
-                    metadata: { gameType: "trivia" }
-                }, {
+                const callbacks = {
                     onReadyForServerCompletion: function(paymentId, txid) {
                         alert("Payment Ready! TXID: " + txid);
                     },
@@ -56,9 +51,15 @@
                     onIncompletePaymentFound: function(payment) {
                         alert("Incomplete payment found.");
                     }
-                });
+                };
+
+                Pi.createPayment({
+                    amount: 0.1,
+                    memo: "SkillClash AI Entry",
+                    metadata: { gameType: "trivia" }
+                }, callbacks);
             } catch(e) {
-                alert("Payment trigger failed: " + e.message);
+                alert("Trigger exception: " + e.message);
             }
         }
     </script>
