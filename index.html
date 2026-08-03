@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js?v=105"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=106"></script>
 </head>
 <body>
     <h1 id="status">CONNECTING TO PI...</h1>
@@ -50,12 +50,12 @@
 
             const callbacks = {
                 onReadyForServerApproval: function(paymentId) {
-                    // This is where a backend server would normally approve the payment.
-                    console.log("Server approval triggered for paymentId: " + paymentId);
-                    alert("Approval requested for ID: " + paymentId.substring(0,8) + "...");
+                    // In a production app, you send paymentId to your backend.
+                    // For static GitHub Pages sandbox testing, we log it and notify.
+                    console.log("Approval event fired for: " + paymentId);
                 },
                 onReadyForServerCompletion: function(paymentId, txid) {
-                    alert("Payment Completed Successfully! TXID: " + txid);
+                    alert("Payment Successful! TXID: " + txid);
                 },
                 onCancel: function(paymentId) {
                     alert("Payment cancelled.");
