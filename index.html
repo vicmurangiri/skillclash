@@ -1,39 +1,57 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js?v=106"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=2.0"></script>
 </head>
 <body>
-    <h1 id="status">CONNECTING TO PI...</h1>
-    <button onclick="triggerPiPayment()" id="playBtn" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer;">PLAY TRIVIA (0.1 Pi)</button>
+    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+        <h1 id="status">CONNECTING TO PI...</h1>
+        <button id="signInBtn" onclick="triggerPiAuth()" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: #6200ee; color: white; border: none; border-radius: 5px;">Sign In with Pi</button>
+        <div id="gameContainer" style="display:none; margin-top: 20px;">
+            <button onclick="triggerPiPayment()" style="padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: #03dac6; color: black; border: none; border-radius: 5px;">PLAY TRIVIA (0.1 Pi)</button>
+        </div>
+    </div>
 
     <script>
-        let sdkTimer = setTimeout(() => {
-            if(document.getElementById('status').innerText.includes("CONNECTING")) {
-                document.getElementById('status').innerText = "READY (SANDBOX MODE)";
-                document.getElementById('playBtn').style.display = "block";
+        async function initPiApp() {
+            try {
+                // Pi.init is treated as a Promise; await it fully before calling authenticate
+                await Pi.init({ version: "2.0", sandbox: true });
+                document.getElementById('status').innerText = "READY FOR AUTH";
+                document.getElementById('signInBtn').style.display = "inline-block";
+                
+                // Automatically trigger authentication when the app loads
+                triggerPiAuth();
+            } catch (error) {
+                document.getElementById('status').innerText = "INIT ERROR: " + error;
+                document.getElementById('signInBtn').style.display = "inline-block";
             }
-        }, 3000);
+        }
 
-        try {
-            Pi.init({ version: "2.0", sandbox: true });
+        function triggerPiAuth() {
+            document.getElementById('status').innerText = "AUTHENTICATING...";
             
-            Pi.authenticate(['username', 'payments'], function(auth) {
-                clearTimeout(sdkTimer);
-                document.getElementById('status').textContent = "PILOT: " + auth.user.username;
-                document.getElementById('playBtn').style.display = "block";
-            }, function(err) {
-                clearTimeout(sdkTimer);
-                document.getElementById('status').textContent = "AUTH ERROR: " + err;
-                document.getElementById('playBtn').style.display = "block";
+            const scopes = ['username', 'payments'];
+
+            function onIncompletePaymentFound(payment) {
+                console.log("Incomplete payment found:", payment);
+            }
+
+            Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                document.getElementById('status').innerText = "WELCOME, " + auth.user.username;
+                document.getElementById('signInBtn').style.display = "none";
+                document.getElementById('gameContainer').style.display = "block";
+                
+                // Send the accessToken to backend or validate via GET https://api.minepi.com/v2/me
+                console.log("Access Token received:", auth.accessToken);
+            }).catch(function(error) {
+                document.getElementById('status').innerText = "AUTH FAILED: " + error;
+                document.getElementById('signInBtn').style.display = "inline-block";
             });
-        } catch (e) {
-            clearTimeout(sdkTimer);
-            document.getElementById('status').textContent = "INIT ERROR: " + e;
-            document.getElementById('playBtn').style.display = "block";
         }
 
         function triggerPiPayment() {
@@ -50,9 +68,7 @@
 
             const callbacks = {
                 onReadyForServerApproval: function(paymentId) {
-                    // In a production app, you send paymentId to your backend.
-                    // For static GitHub Pages sandbox testing, we log it and notify.
-                    console.log("Approval event fired for: " + paymentId);
+                    console.log("Server approval required for: " + paymentId);
                 },
                 onReadyForServerCompletion: function(paymentId, txid) {
                     alert("Payment Successful! TXID: " + txid);
@@ -71,6 +87,11 @@
                 alert("SDK Internal Error: " + err.message);
             }
         }
+
+        // Initialize on load
+        window.onload = initPiApp;
     </script>
 </body>
 </html>
+
+```
