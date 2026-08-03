@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillClash AI Arena</title>
-    <script src="https://sdk.minepi.com/pi-sdk.js?v=102"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js?v=104"></script>
 </head>
 <body>
     <h1 id="status">CONNECTING TO PI...</h1>
@@ -42,28 +42,31 @@
                 return;
             }
 
+            const paymentData = {
+                amount: 0.1,
+                memo: "SkillClash AI Entry",
+                metadata: { gameType: "trivia" }
+            };
+
+            const callbacks = {
+                onReadyForServerApproval: function(paymentId) {
+                    console.log("Approval needed for: " + paymentId);
+                },
+                onReadyForServerCompletion: function(paymentId, txid) {
+                    alert("Payment Ready! TXID: " + txid);
+                },
+                onCancel: function(paymentId) {
+                    alert("Payment cancelled.");
+                },
+                onError: function(error, payment) {
+                    alert("Payment error: " + (error ? error.message : "Unknown error"));
+                }
+            };
+
             try {
-                Pi.createPayment(
-                    {
-                        amount: 0.1,
-                        memo: "SkillClash AI Entry",
-                        metadata: { gameType: "trivia" }
-                    },
-                    function(paymentId, txid) {
-                        alert("Ready for server completion. TXID: " + txid);
-                    },
-                    function(paymentId) {
-                        alert("Payment cancelled.");
-                    },
-                    function(error, payment) {
-                        alert("Payment error occurred.");
-                    },
-                    function(payment) {
-                        alert("Incomplete payment found.");
-                    }
-                );
+                Pi.createPayment(paymentData, callbacks);
             } catch (err) {
-                alert("Creation caught: " + err.message);
+                alert("SDK Internal Error: " + err.message);
             }
         }
     </script>
