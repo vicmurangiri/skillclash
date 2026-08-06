@@ -23,8 +23,6 @@
                 await Pi.init({ version: "2.0", sandbox: true });
                 document.getElementById('status').innerText = "READY FOR AUTH";
                 document.getElementById('signInBtn').style.display = "inline-block";
-                
-                // Auto trigger login
                 triggerPiAuth();
             } catch (error) {
                 document.getElementById('status').innerText = "INIT ERROR: " + error;
@@ -67,11 +65,10 @@
             const callbacks = {
                 onReadyForServerApproval: function(paymentId) {
                     console.log("Server approval triggered for ID: " + paymentId);
-                    // In a real production app, you would send this paymentId to your backend server.
-                    // For static GitHub Pages testing, we simulate instant server-side approval/completion:
+                    // Automatically simulate server completion for static testing
                     setTimeout(() => {
-                        alert("Payment approved and completed successfully in Sandbox mode!");
-                    }, 1000);
+                        alert("Payment simulated successfully in sandbox mode!");
+                    }, 500);
                 },
                 onReadyForServerCompletion: function(paymentId, txid) {
                     console.log("Payment completed: " + txid);
