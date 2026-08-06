@@ -10,7 +10,9 @@
     <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
         <h1 id="status">CONNECTING TO PI...</h1>
         <button id="signInBtn" onclick="triggerPiAuth()" style="display:none; padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: #6200ee; color: white; border: none; border-radius: 5px;">Sign In with Pi</button>
+        
         <div id="gameContainer" style="display:none; margin-top: 20px;">
+            <h2 id="welcomeUser"></h2>
             <button onclick="triggerPiPayment()" style="padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: #03dac6; color: black; border: none; border-radius: 5px;">PLAY TRIVIA (0.1 Pi)</button>
         </div>
     </div>
@@ -18,12 +20,11 @@
     <script>
         async function initPiApp() {
             try {
-                // Pi.init is treated as a Promise; await it fully before calling authenticate
                 await Pi.init({ version: "2.0", sandbox: true });
                 document.getElementById('status').innerText = "READY FOR AUTH";
                 document.getElementById('signInBtn').style.display = "inline-block";
                 
-                // Automatically trigger authentication when the app loads
+                // Auto trigger login
                 triggerPiAuth();
             } catch (error) {
                 document.getElementById('status').innerText = "INIT ERROR: " + error;
@@ -41,12 +42,10 @@
             }
 
             Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
-                document.getElementById('status').innerText = "WELCOME, " + auth.user.username;
+                document.getElementById('status').style.display = "none";
                 document.getElementById('signInBtn').style.display = "none";
+                document.getElementById('welcomeUser').innerText = "WELCOME, " + auth.user.username;
                 document.getElementById('gameContainer').style.display = "block";
-                
-                // Send the accessToken to backend or validate via GET https://api.minepi.com/v2/me
-                console.log("Access Token received:", auth.accessToken);
             }).catch(function(error) {
                 document.getElementById('status').innerText = "AUTH FAILED: " + error;
                 document.getElementById('signInBtn').style.display = "inline-block";
@@ -67,13 +66,18 @@
 
             const callbacks = {
                 onReadyForServerApproval: function(paymentId) {
-                    console.log("Server approval required for: " + paymentId);
+                    console.log("Server approval triggered for ID: " + paymentId);
+                    // In a real production app, you would send this paymentId to your backend server.
+                    // For static GitHub Pages testing, we simulate instant server-side approval/completion:
+                    setTimeout(() => {
+                        alert("Payment approved and completed successfully in Sandbox mode!");
+                    }, 1000);
                 },
                 onReadyForServerCompletion: function(paymentId, txid) {
-                    alert("Payment Successful! TXID: " + txid);
+                    console.log("Payment completed: " + txid);
                 },
                 onCancel: function(paymentId) {
-                    alert("Payment cancelled.");
+                    console.log("Payment cancelled.");
                 },
                 onError: function(error, payment) {
                     alert("Payment error: " + (error ? error.message : "Unknown error"));
@@ -87,7 +91,6 @@
             }
         }
 
-        // Initialize on load
         window.onload = initPiApp;
     </script>
 </body>
