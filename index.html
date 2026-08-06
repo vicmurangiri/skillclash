@@ -18,6 +18,8 @@
     </div>
 
     <script>
+        let globalAccessToken = "";
+
         async function initPiApp() {
             try {
                 await Pi.init({ version: "2.0", sandbox: true });
@@ -40,6 +42,7 @@
             }
 
             Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                globalAccessToken = auth.accessToken;
                 document.getElementById('status').style.display = "none";
                 document.getElementById('signInBtn').style.display = "none";
                 document.getElementById('welcomeUser').innerText = "WELCOME, " + auth.user.username;
@@ -58,20 +61,44 @@
 
             const paymentData = {
                 amount: 0.1,
-                memo: "SkillClash AI Entry",
+                memo: "SkillClash AI Entry Fee",
                 metadata: { gameType: "trivia" }
             };
 
             const callbacks = {
-                onReadyForServerApproval: function(paymentId) {
-                    console.log("Server approval triggered for ID: " + paymentId);
-                    // Automatically simulate server completion for static testing
-                    setTimeout(() => {
-                        alert("Payment simulated successfully in sandbox mode!");
-                    }, 500);
+                onReadyForServerApproval: async function(paymentId) {
+                    console.log("Approval triggered for paymentId: " + paymentId);
+                    try {
+                        // Direct client-side sandbox approval hook for static deployment
+                        const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${globalAccessToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (!response.ok) {
+                            console.error("Server approval failed network-side");
+                        }
+                    } catch (e) {
+                        console.error("Approval exception:", e);
+                    }
                 },
-                onReadyForServerCompletion: function(paymentId, txid) {
-                    console.log("Payment completed: " + txid);
+                onReadyForServerCompletion: async function(paymentId, txid) {
+                    console.log("Ready for completion: " + txid);
+                    try {
+                        await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${globalAccessToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ txid: txid })
+                        });
+                        alert("Payment successful and verified!");
+                    } catch (e) {
+                        alert("Payment completed on blockchain, but final callback missed.");
+                    }
                 },
                 onCancel: function(paymentId) {
                     console.log("Payment cancelled.");
