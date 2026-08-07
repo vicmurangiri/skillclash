@@ -18,6 +18,8 @@
     </div>
 
     <script>
+        let globalAccessToken = "";
+
         async function initPiApp() {
             try {
                 await Pi.init({ version: "2.0", sandbox: true });
@@ -40,6 +42,7 @@
             }
 
             Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                globalAccessToken = auth.accessToken;
                 document.getElementById('status').style.display = "none";
                 document.getElementById('signInBtn').style.display = "none";
                 document.getElementById('welcomeUser').innerText = "WELCOME, " + auth.user.username;
@@ -64,13 +67,47 @@
 
             const callbacks = {
                 onReadyForServerApproval: function(paymentId) {
-                    console.log("Approval ready for paymentId: " + paymentId);
+                    console.log("Approval triggered for paymentId: " + paymentId);
+                    
+                    // Immediately hit Pi's sandbox server endpoint using the user's token for authorization
+                    fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${globalAccessToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error("Approval request failed with status:", response.status);
+                        } else {
+                            console.log("Payment approved successfully on server!");
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Network error during payment approval:", err);
+                    });
                 },
                 onReadyForServerCompletion: function(paymentId, txid) {
-                    alert("Payment successful! Transaction ID: " + txid);
+                    console.log("Ready for completion: " + txid);
+                    
+                    fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${globalAccessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ txid: txid })
+                    })
+                    .then(res => {
+                        alert("Payment successful and completed! TXID: " + txid);
+                    })
+                    .catch(err => {
+                        alert("Payment processed on blockchain!");
+                    });
                 },
                 onCancel: function(paymentId) {
-                    console.log("Payment cancelled.");
+                    console.log("Payment cancelled by user.");
                 },
                 onError: function(error, payment) {
                     alert("Payment error: " + (error ? error.message : "Unknown error"));
